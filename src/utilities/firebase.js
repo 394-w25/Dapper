@@ -22,34 +22,18 @@ const firebaseConfig = {
 const firebase = initializeApp(firebaseConfig);
 
 // Initialize services
-const auth = getAuth(firebase);  // Authentication
-const database = getDatabase(firebase); // Realtime Database
-const storage = getStorage(firebase);  // Storage
+const auth = getAuth(firebase); 
+const database = getDatabase(firebase); 
+const storage = getStorage(firebase); 
 
 // Export services for use in other files
 export { auth, database, storage };
-
-// export const signInWithGoogle = async() => {
-//   const result = await signInWithPopup(auth, new GoogleAuthProvider());
-//   return result;
-// };
 
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-
-    // Check if the email is from Northwestern
-    const emailDomain = user.email.split('@')[1];
-    if (
-      emailDomain !== 'northwestern.edu' &&
-      emailDomain !== 'u.northwestern.edu'
-    ) {
-      throw new Error('Please use a Northwestern University email to sign in.');
-    }
-
-    // Continue with the authenticated user
     return user;
   } catch (error) {
     console.error('Google sign-in failed:', error.message);
@@ -117,7 +101,7 @@ export const useDbData = (path) => {
       }
     );
 
-    return () => unsubscribe(); // Cleanup listener on unmount or path change
+    return () => unsubscribe();
   }, [path]);
 
   return [data, error];
@@ -149,8 +133,6 @@ export const useDbAdd = (path) => {
 export const useDbUpdate = (path) => {
   const [result, setResult] = useState();
   const updateData = useCallback(async (value) => {
-      // console.log('Updating path:', path);
-      // console.log('Value before update:', value);
 
       if (!value || typeof value !== 'object') {
           console.error("Invalid value passed to updateData:", value);

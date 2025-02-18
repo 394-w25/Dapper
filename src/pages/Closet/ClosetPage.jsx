@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';  // ✅ Import useNavigate
 import './ClosetPage.css';
 import Button from 'react-bootstrap/Button';
-import { signOut } from '../../utilities/firebase';
 
 const ClosetPage = () => {
   const navigate = useNavigate(); // ✅ Hook for navigation
@@ -27,6 +26,9 @@ const ClosetPage = () => {
 
       <Button variant="danger" onClick={handleSignOut}>
         Sign Out
+        </Button>
+      <Button variant="primary" onClick={() => navigate('/mycloset')}>
+        My Closet
       </Button>
     </div>
   );

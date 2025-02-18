@@ -1,45 +1,57 @@
-import { useState } from 'react';
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SignInPage from './pages/SignIn/SignInPage';
+import ChatPage from './pages/Chat/ChatPage';
+import ClosetPage from './pages/Closet/ClosetPage';
+import DiscoverPage from './pages/Discover/DiscoverPage';
+import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
+import ProfilePage from './pages/Profile/ProfilePage';
+import NotFoundPage from './pages/NotFound/NotFoundPage';
+import NavigationBar from './components/navigation/NavigationBar';
+import { useAuthState } from './utilities/firebase';
+import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
 import './App.css';
 
 const App = () => {
-  const [count, setCount] = useState(0);
+  const [user, loading, error] = useAuthState();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button onClick={() => setCount(count => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.jsx</code> and save to test hot module replacement (HMR).
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <>
+      {!user ? (
+        <SignInPage />
+      ) : (
+        <>
+          <div className="main-content">
+            <Routes>
+              <Route path="/" element={<ClosetPage />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/discover" element={<DiscoverPage />} />
+              <Route path="/outfit-builder" element={<OutfitBuilder />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </div>
+          <NavigationBar />
+        </>
+      )};
+    </>
   );
 };
 
-export default App;
+const AppWrapper = () => (
+  <Router>
+    <SmartphoneFrame>
+      <App />
+    </SmartphoneFrame>
+  </Router>
+);
+
+export default AppWrapper;

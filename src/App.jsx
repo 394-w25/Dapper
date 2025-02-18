@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
 import ClosetPage from './pages/Closet/ClosetPage';
+import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import ProfilePage from './pages/Profile/ProfilePage';
@@ -32,6 +33,7 @@ const App = () => {
           <div className="main-content">
             <Routes>
               <Route path="/" element={<ClosetPage />} />
+              <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/outfit-builder" element={<OutfitBuilder />} />

@@ -73,15 +73,41 @@ const AddItem = () => {
     setItem({ ...item, [e.target.name]: e.target.value });
   };
 
+  const [imageUrlInput, setImageUrlInput] = useState(""); // ✅ Fix for undefined variable
+
+  const handleUrlUpload = async () => {
+    if (!imageUrlInput.trim()) return; // Prevent empty input
+  
+    try {
+      const response = await fetch(imageUrlInput);
+      if (!response.ok) throw new Error("Invalid Image URL");
+  
+      const blob = await response.blob();
+      const file = new File([blob], "uploaded-image.jpg", { type: blob.type });
+  
+      const imageRef = storageRef(storage, `clothing/${file.name}`);
+      await uploadBytes(imageRef, file);
+      const downloadUrl = await getDownloadURL(imageRef);
+  
+      setItem({ ...item, imageUrl: downloadUrl });
+      setImageUrlInput(""); // ✅ Clear input field after successful upload
+    } catch (error) {
+      console.error("Error uploading image from URL:", error);
+      alert("Failed to upload image from URL. Please check the link.");
+    }
+  };
+  
+  
+
 
   // Handle Image Upload
-  const handleImageUpload = async () => {
-    if (!imageFile) {
+  const handleImageUpload = async (file) => {
+    if (!file) {
       alert("Please select an image file.");
       return;
     }
   
-    if (!imageFile.type.startsWith("image/")) {
+    if (!file.type.startsWith("image/")) {
       alert("Invalid file type. Please select an image.");
       return;
     }
@@ -92,9 +118,8 @@ const AddItem = () => {
       return;
     }
   
-    // Convert image to FormData
     const formData = new FormData();
-    formData.append("image_file", imageFile);
+    formData.append("image_file", file);
     formData.append("size", "auto");
   
     try {
@@ -121,6 +146,7 @@ const AddItem = () => {
       alert("Failed to remove background. Please try again.");
     }
   };
+  
   
   // Save to Firebase
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -155,29 +181,88 @@ const handleSave = async () => {
       <Card className="p-4 shadow-sm">
         <h2 className="text-center">New Item</h2>
 
-       {/* Image Upload */}
-        <Form.Group controlId="imageUpload" className="mb-3">
-        {item.imageUrl ? (
-            <>
-            <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded mb-2" />
-            <Button
-                variant="danger"
-                className="w-100 mb-2"
-                onClick={() => {
-                setImageFile(null);
-                setItem({ ...item, imageUrl: "" });
-                }}
-            >
-                Remove Image
-            </Button>
-            </>
-        ) : (
-            <Form.Control type="file" onChange={(e) => setImageFile(e.target.files[0])} />
-        )}
-        <Button variant="secondary" className="mt-2 w-100" onClick={handleImageUpload} disabled={!imageFile}>
-            Upload Image
+        {/* Image Upload Options */}
+<Form.Group controlId="imageUpload" className="mb-3">
+  {item.imageUrl ? (
+    <>
+      {/* Display Uploaded Image */}
+      <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded mb-2" />
+      <Button
+        variant="danger"
+        className="w-100 mb-2"
+        onClick={() => {
+          setImageFile(null);
+          setItem({ ...item, imageUrl: "" });
+        }}
+      >
+        Remove Image
+      </Button>
+    </>
+  ) : (
+    <>
+      {/* ✅ Take a Photo (Opens Camera Directly) */}
+      <Form.Group controlId="cameraUpload" className="mb-3">
+        <Form.Label>Take a Photo</Form.Label>
+        <Button
+          variant="primary"
+          className="w-100"
+          onClick={() => document.getElementById("cameraInput").click()}
+        >
+          Open Camera
         </Button>
-        </Form.Group>
+        <Form.Control
+          id="cameraInput"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style={{ display: "none" }} // Hide file input
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) handleImageUpload(file);
+          }}
+        />
+      </Form.Group>
+
+      {/* ✅ Upload from Device Storage */}
+      <Form.Group controlId="galleryUpload" className="mb-3">
+        <Form.Label>Upload from Gallery</Form.Label>
+        <Form.Control
+          type="file"
+          accept="image/*"
+          onClick={(e) => (e.target.value = null)}
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) handleImageUpload(file);
+          }}
+        />
+      </Form.Group>
+    </>
+  )}
+</Form.Group>
+
+{/* ✅ Hide "Upload from URL" when an image is uploaded */}
+{!item.imageUrl && (
+  <Form.Group className="mb-3">
+    <Form.Label>Upload from URL</Form.Label>
+    <Form.Control
+      type="text"
+      placeholder="Paste image link (Instagram, Twitter, etc.)"
+      value={imageUrlInput}
+      onChange={(e) => setImageUrlInput(e.target.value)}
+    />
+    <Button
+      variant="secondary"
+      className="mt-2 w-100"
+      onClick={handleUrlUpload}
+      disabled={!imageUrlInput.trim()}
+    >
+      Upload from Link
+    </Button>
+  </Form.Group>
+)}
+
+
+
 
 
         {/* Form Fields */}

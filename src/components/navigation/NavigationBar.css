@@ -10,7 +10,7 @@
     width: 100%;
     background-color: rgb(248, 249, 250);
     border-top: 1px solid #ddd;
-    z-index: 100;
+    z-index: 5;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     padding: 3px 0;
     padding-left: 5px;

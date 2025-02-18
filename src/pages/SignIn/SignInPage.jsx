@@ -53,7 +53,7 @@ const Login = () => {
                     alt="Google logo"
                     className="google-icon"
                 />
-                Sign In with Google
+                Sign in with Google
             </button>
             {error && <p className="error-message">{error}</p>}
         </div>

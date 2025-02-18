@@ -16,23 +16,10 @@ body {
 }
 
 .main-content {
-  padding-top: 85px;
+  padding-top: 20px;
   flex: 1;
   padding-bottom: 60px;
 }
-
-/* Header styling */
-/* .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background-color: #eae7f5;
-  border-bottom: 1px solid #ddd;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-} */
 
 /* Make it look better on smaller screens */
 @media screen and (max-width: 480px) {

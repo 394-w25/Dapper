@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Form, Button, Container, Card, Modal, ListGroup } from "react-bootstrap";
 import { getDatabase, ref, push, set } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import axios from "axios";
+
+
 
 const categories = {
     Tops: ["T-Shirt", "Sweater", "Blouse", "Hoodie", "Tank Top", "Polo Shirt"],
@@ -37,16 +40,55 @@ const AddItem = () => {
     setItem({ ...item, [e.target.name]: e.target.value });
   };
 
+
   // Handle Image Upload
   const handleImageUpload = async () => {
-    if (!imageFile) return;
-
-    const imageRef = storageRef(storage, `clothing/${imageFile.name}`);
-    await uploadBytes(imageRef, imageFile);
-    const downloadUrl = await getDownloadURL(imageRef);
-    setItem({ ...item, imageUrl: downloadUrl });
+    if (!imageFile) {
+      alert("Please select an image file.");
+      return;
+    }
+  
+    if (!imageFile.type.startsWith("image/")) {
+      alert("Invalid file type. Please select an image.");
+      return;
+    }
+  
+    const apiKey = import.meta.env.VITE_REMOVE_BG_API_KEY;
+    if (!apiKey) {
+      console.error("RemoveBG API Key is missing! Check your .env setup.");
+      return;
+    }
+  
+    // Convert image to FormData
+    const formData = new FormData();
+    formData.append("image_file", imageFile);
+    formData.append("size", "auto");
+  
+    try {
+      // Send image to remove.bg API
+      const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
+        headers: {
+          "X-Api-Key": apiKey,
+          "Content-Type": "multipart/form-data",
+        },
+        responseType: "blob",
+      });
+  
+      // Create a new file from the response
+      const removedBgFile = new File([response.data], "removed-bg.png", { type: "image/png" });
+  
+      // Upload the cleaned image to Firebase
+      const imageRef = storageRef(storage, `clothing/${removedBgFile.name}`);
+      await uploadBytes(imageRef, removedBgFile);
+      const downloadUrl = await getDownloadURL(imageRef);
+  
+      setItem({ ...item, imageUrl: downloadUrl });
+    } catch (error) {
+      console.error("Error removing background:", error);
+      alert("Failed to remove background. Please try again.");
+    }
   };
-
+  
   // Save to Firebase
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 

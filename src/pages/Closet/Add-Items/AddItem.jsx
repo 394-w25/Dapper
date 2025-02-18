@@ -80,17 +80,30 @@ const handleSave = async () => {
       <Card className="p-4 shadow-sm">
         <h2 className="text-center">New Item</h2>
 
-        {/* Image Upload */}
+       {/* Image Upload */}
         <Form.Group controlId="imageUpload" className="mb-3">
-          {item.imageUrl ? (
-            <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded" />
-          ) : (
+        {item.imageUrl ? (
+            <>
+            <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded mb-2" />
+            <Button
+                variant="danger"
+                className="w-100 mb-2"
+                onClick={() => {
+                setImageFile(null);
+                setItem({ ...item, imageUrl: "" });
+                }}
+            >
+                Remove Image
+            </Button>
+            </>
+        ) : (
             <Form.Control type="file" onChange={(e) => setImageFile(e.target.files[0])} />
-          )}
-          <Button variant="secondary" className="mt-2 w-100" onClick={handleImageUpload}>
+        )}
+        <Button variant="secondary" className="mt-2 w-100" onClick={handleImageUpload} disabled={!imageFile}>
             Upload Image
-          </Button>
+        </Button>
         </Form.Group>
+
 
         {/* Form Fields */}
         <Form>

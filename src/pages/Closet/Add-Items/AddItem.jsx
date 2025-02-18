@@ -7,15 +7,48 @@ import axios from "axios";
 
 
 const categories = {
-    Tops: ["T-Shirt", "Sweater", "Blouse", "Hoodie", "Tank Top", "Polo Shirt"],
-    Bottoms: ["Jeans", "Skirt", "Shorts", "Trousers", "Leggings", "Joggers"],
-    Shoes: ["Sneakers", "Boots", "Sandals", "Loafers", "Heels", "Slippers"],
-    Accessories: ["Hat", "Scarf", "Watch", "Belt", "Earrings", "Necklace"],
-    Outerwear: ["Jacket", "Coat", "Blazer", "Windbreaker"],
-    Bags: ["Backpack", "Handbag", "Tote", "Clutch"],
-    Dresses: ["Casual Dress", "Evening Dress", "Gown", "Sundress"],
-    Others: ["Costumes", "Sleepwear", "Gym Wear", "Swimwear"]
-  };
+    Tops: [
+        "T-Shirt", "Sweater", "Blouse", "Hoodie", "Tank Top", "Polo Shirt",
+        "Long Sleeve Shirt", "Crop Top", "Cardigan", "Vest"
+    ],
+    Bottoms: [
+        "Jeans", "Skirt", "Shorts", "Trousers", "Leggings", "Joggers",
+        "Chinos", "Cargo Pants", "Dress Pants"
+    ],
+    Shoes: [
+        "Sneakers", "Boots", "Sandals", "Loafers", "Heels", "Slippers",
+        "Formal Shoes", "Running Shoes", "Moccasins", "Derby Shoes"
+    ],
+    Accessories: [
+        "Hat", "Scarf", "Watch", "Belt", "Earrings", "Necklace",
+        "Bracelet", "Gloves", "Socks", "Sunglasses", "Cufflinks", "Tie", "Bow Tie"
+    ],
+    Outerwear: [
+        "Jacket", "Coat", "Blazer", "Windbreaker", "Trench Coat",
+        "Denim Jacket", "Puffer Jacket", "Bomber Jacket", "Raincoat"
+    ],
+    Bags: [
+        "Backpack", "Handbag", "Tote", "Clutch", "Messenger Bag",
+        "Crossbody Bag", "Briefcase", "Duffle Bag", "Fanny Pack"
+    ],
+    Formalwear: [
+        "Suit", "Tuxedo", "Dress Shirt", "Blazer", "Tie", "Bow Tie",
+        "Formal Trousers", "Cufflinks"
+    ],
+    Dresses: [
+        "Casual Dress", "Evening Dress", "Gown", "Sundress",
+        "Cocktail Dress", "Maxi Dress", "Mini Dress", "Bodycon Dress"
+    ],
+    Activewear: [
+        "Gym Wear", "Tracksuit", "Yoga Pants", "Compression Shirt",
+        "Running Shorts", "Sport Bra", "Tank Top"
+    ],
+    Others: [
+        "Costumes", "Sleepwear", "Swimwear", "Kimono", "Poncho",
+        "Lounge Wear", "Thermal Wear", "Robe"
+    ]
+};
+
   
 const AddItem = () => {
   const [item, setItem] = useState({

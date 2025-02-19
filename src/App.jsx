@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
@@ -50,12 +50,33 @@ const App = () => {
   );
 };
 
-const AppWrapper = () => (
-  <Router>
-    <SmartphoneFrame>
-      <App />
-    </SmartphoneFrame>
-  </Router>
-);
+// const AppWrapper = () => (
+//   <Router>
+//     <SmartphoneFrame>
+//       <App />
+//     </SmartphoneFrame>
+//   </Router>
+// );
+
+// export default AppWrapper;
+
+const AppWrapper = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <Router>
+      {isMobile ? <App /> : <SmartphoneFrame><App /></SmartphoneFrame>}
+    </Router>
+  );
+};
 
 export default AppWrapper;

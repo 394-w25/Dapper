@@ -1,11 +1,14 @@
 import React from 'react';
+import Header from "../../components/header/Header";
 import './DiscoverPage.css';
 
 const DiscoverPage = () => {
   return (
     <div className="discover">
-      <h1>Discover</h1>
-      <p>Discover stuff here</p>
+      <Header title="Discover" />
+      <div className="discover-content">
+        <p>Discover stuff here</p>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Button, Container, Card, Modal, ListGroup } from "react-bootstrap";
 import { getDatabase, ref, push, set } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 import axios from "axios";
 
 
@@ -151,29 +152,44 @@ const AddItem = () => {
   // Save to Firebase
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-const handleSave = async () => {
-  if (!item.name || !item.category) {
-    alert("Please fill all required fields.");
-    return;
-  }
 
-  const newItemRef = push(ref(db, "clothing"));
-  await set(newItemRef, { ...item, createdAt: Date.now() });
-
-  // Show success modal
-  setShowSuccessModal(true);
-
-  // Reset form
-  setItem({
-    name: "",
-    category: "",
-    subcategory: "",
-    brand: "",
-    size: "",
-    color: "",
-    imageUrl: "",
-  });
-};
+  const handleSave = async () => {
+    if (!item.name || !item.category) {
+      alert("Please fill all required fields.");
+      return;
+    }
+  
+    const auth = getAuth();
+    const user = auth.currentUser; // Get logged-in user
+    if (!user) {
+      alert("You must be logged in to save items.");
+      return;
+    }
+  
+    const userId = user.uid; // Get user's unique ID
+  
+    const newItemRef = push(ref(db, "clothing")); // Keep all items under "clothing"
+    await set(newItemRef, { 
+      ...item, 
+      createdAt: Date.now(),
+      userId: userId // ✅ Associate item with the user
+    });
+  
+    // Show success modal
+    setShowSuccessModal(true);
+  
+    // Reset form
+    setItem({
+      name: "",
+      category: "",
+      subcategory: "",
+      brand: "",
+      size: "",
+      color: "",
+      imageUrl: "",
+    });
+  };
+  
 
 
   return (
@@ -201,27 +217,7 @@ const handleSave = async () => {
   ) : (
     <>
       {/* ✅ Take a Photo (Opens Camera Directly) */}
-      <Form.Group controlId="cameraUpload" className="mb-3">
-        <Form.Label>Take a Photo</Form.Label>
-        <Button
-          variant="primary"
-          className="w-100"
-          onClick={() => document.getElementById("cameraInput").click()}
-        >
-          Open Camera
-        </Button>
-        <Form.Control
-          id="cameraInput"
-          type="file"
-          accept="image/*"
-          capture="environment"
-          style={{ display: "none" }} // Hide file input
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) handleImageUpload(file);
-          }}
-        />
-      </Form.Group>
+     
 
       {/* ✅ Upload from Device Storage */}
       <Form.Group controlId="galleryUpload" className="mb-3">
@@ -260,8 +256,6 @@ const handleSave = async () => {
     </Button>
   </Form.Group>
 )}
-
-
 
 
 

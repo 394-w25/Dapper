@@ -152,7 +152,8 @@ const AddItem = () => {
       });
 
       // Create a new file from the response
-      const removedBgFile = new File([response.data], "removed-bg.png", { type: "image/png" });
+      const uniqueFilename = `removed-bg-${Date.now()}.png`;
+      const removedBgFile = new File([response.data], uniqueFilename, { type: "image/png" });
 
       // Upload the cleaned image to Firebase Storage
       const imageRef = storageRef(storage, `clothing/${removedBgFile.name}`);

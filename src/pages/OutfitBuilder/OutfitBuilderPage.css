@@ -87,6 +87,10 @@
     padding: 10px 0;
     margin-bottom: 10px;
   }
+
+  .categories::-webkit-scrollbar {
+    display: none;
+  }
   
   .category-button {
     display: inline-flex;

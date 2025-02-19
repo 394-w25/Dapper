@@ -1,5 +1,5 @@
-// ClosetPage.jsx
 import React from 'react';
+import Header from "../../components/header/Header";
 import { useNavigate } from 'react-router-dom';
 import './ClosetPage.css';
 import { TbHanger } from "react-icons/tb";
@@ -11,8 +11,8 @@ const ClosetPage = () => {
 
   return (
     <div className="closet">
+      <Header title="Closet" />
       <div className="closet-header">
-        <h1>My Closet</h1>
         <p>What would you like to do today?</p>
       </div>
 

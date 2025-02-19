@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './OutfitBuilderPage.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, ButtonGroup, Button, Row, Col, Card, Nav } from "react-bootstrap";
+import { Container, ButtonGroup, Button, Row, Col, Card, Nav, Modal, Form } from "react-bootstrap";
 import Header from "../../components/header/Header";
 import { useDbData, useAuthState } from "../../utilities/firebase";
 import { database } from "../../utilities/firebase";
-import { ref, get } from "firebase/database";
+import { ref, get, push, set } from 'firebase/database';
 import { FaTshirt } from 'react-icons/fa';
 import { FaBagShopping } from 'react-icons/fa6';
 import { TbHanger } from "react-icons/tb";
 import { PiPantsFill } from "react-icons/pi";
 import { GiRunningShoe } from "react-icons/gi";
-import { FiMinusCircle } from 'react-icons/fi';
-import { Modal, Form } from 'react-bootstrap';
-import { push, set } from 'firebase/database';
+import { FiMinusCircle, FiSave, FiMessageSquare, FiX } from 'react-icons/fi';
 
 const categories = [
   { name: 'All', icon: <TbHanger /> },
@@ -31,6 +29,7 @@ const OutfitBuilderPage = () => {
   const [clickedItems, setClickedItems] = useState(new Set());
   const [showModal, setShowModal] = useState(false);
   const [outfitName, setOutfitName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
 
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
 
@@ -83,9 +82,8 @@ const OutfitBuilderPage = () => {
   const saveOutfit = () => {
     if (!user || outfitItems.length === 0 || !outfitName) return; // Ensure user, outfitItems, and name are valid
 
-    // Generate a unique outfit ID using Date.now() or Firebase push
+    // Generate a unique outfit ID using Firebase push
     const outfitId = push(ref(database, 'outfits')).key;
-
     const clothingIDs = outfitItems.map(item => item.id);
 
     // Prepare the outfit data
@@ -94,7 +92,7 @@ const OutfitBuilderPage = () => {
       clothingIDs: clothingIDs,
       createdAt: Date.now(),
       createdBy: user.uid,
-      imageUrl: "placeholder", // somehow need to screenshot the whole outfit and make an image
+      imageUrl: "placeholder", // Placeholder for an outfit image
       name: outfitName,
       sharedWith: []
     };
@@ -111,27 +109,25 @@ const OutfitBuilderPage = () => {
         get(userOutfitsRef)
           .then(snapshot => {
             const currentOutfits = snapshot.exists() ? snapshot.val() : [];
-
-            // Add the new outfitId to the array
             const updatedOutfits = [...currentOutfits, outfitId];
 
-            // Update the user's outfits in the database
             set(userOutfitsRef, updatedOutfits)
               .then(() => {
-                console.log('Outfit added to user\'s outfits list');
+                console.log("Outfit added to user's outfits list");
                 setShowModal(false);
                 setOutfitName("");
+                setShowSaveInput(false);
               })
               .catch(error => {
-                console.error('Error updating user\'s outfits:', error);
+                console.error("Error updating user's outfits:", error);
               });
           })
           .catch(error => {
-            console.error('Error fetching user\'s outfits:', error);
+            console.error("Error fetching user's outfits:", error);
           });
       })
       .catch(error => {
-        console.error('Error saving outfit:', error);
+        console.error("Error saving outfit:", error);
       });
   };
 
@@ -140,12 +136,17 @@ const OutfitBuilderPage = () => {
     setClickedItems(prevState => {
       const newState = new Set(prevState);
       if (newState.has(item.id)) {
-        newState.delete(item.id); // Remove if already clicked
+        newState.delete(item.id);
       } else {
-        newState.add(item.id); // Add if not clicked
+        newState.add(item.id);
       }
       return newState;
     });
+  };
+
+  const handleGetFeedback = () => {
+    // Placeholder for feedback functionality
+    console.log("Feedback requested");
   };
 
   return (
@@ -168,7 +169,7 @@ const OutfitBuilderPage = () => {
                       src={item.imageUrl}
                       alt="Clothing item"
                       className="outfit-item-img"
-                      onClick={() => handleClick(item)} // Handle click to show/hide delete badge
+                      onClick={() => handleClick(item)}
                     />
                     {clickedItems.has(item.id) && (
                       <FiMinusCircle
@@ -200,11 +201,12 @@ const OutfitBuilderPage = () => {
 
             <div className="card-group-wrapper">
               <div className="clothing-card-group">
-                {(selectedCategory === 'All' ? clothingItems : clothingItems.filter(item => item.category === selectedCategory)).map((item, index) => (
-                  <Card key={index} className="clothing-option" draggable onDragStart={(e) => handleDragStart(e, item)}>
-                    <Card.Img variant="top" src={item.imageUrl} />
-                  </Card>
-                ))}
+                {(selectedCategory === 'All' ? clothingItems : clothingItems.filter(item => item.category === selectedCategory))
+                  .map((item, index) => (
+                    <Card key={index} className="clothing-option" draggable onDragStart={(e) => handleDragStart(e, item)}>
+                      <Card.Img variant="top" src={item.imageUrl} />
+                    </Card>
+                  ))}
               </div>
             </div>
           </Col>
@@ -213,9 +215,41 @@ const OutfitBuilderPage = () => {
         <Row className="mt-4">
           <Col>
             <div className="footer">
-              <Button className="footer-button" variant="dark" onClick={() => navigate('/mycloset')}>Home</Button>
-              <Button className="footer-button" variant="dark" onClick={() => setShowModal(true)}>Save Outfit</Button>
-              <Button className="footer-button" variant="dark">Get Feedback</Button>
+              {showSaveInput ? (
+               <div className="save-input-section">
+               <input
+                 type="text"
+                 placeholder="Outfit Name"
+                 value={outfitName}
+                 onChange={(e) => setOutfitName(e.target.value)}
+                 className="save-input"
+               />
+               <div className="save-btn-group">
+                 <button className="save-confirm-btn" onClick={saveOutfit}>
+                   <FiSave className="btn-icon" /> Confirm
+                 </button>
+                 <button
+                   className="save-cancel-btn"
+                   onClick={() => {
+                     setShowSaveInput(false);
+                     setOutfitName("");
+                   }}
+                 >
+                   <FiX className="btn-icon" /> Cancel
+                 </button>
+               </div>
+             </div>
+             
+              ) : (
+                <div className="footer-buttons">
+                  <button className="footer-button" onClick={() => setShowSaveInput(true)}>
+                    <FiSave /> Save Outfit
+                  </button>
+                  <button className="footer-button" onClick={handleGetFeedback}>
+                    <FiMessageSquare /> Get Feedback
+                  </button>
+                </div>
+              )}
             </div>
           </Col>
         </Row>

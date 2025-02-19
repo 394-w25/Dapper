@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Card, Modal, ListGroup } from "react-bootstrap";
-import { getDatabase, ref, push, set, get, child, update } from "firebase/database";
+import { getDatabase, ref, push, set, get } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
@@ -50,6 +50,11 @@ const categories = {
     ]
 };
 
+
+const db = getDatabase();
+const storage = getStorage();
+
+
   
 const AddItem = () => {
   const [item, setItem] = useState({
@@ -66,9 +71,7 @@ const AddItem = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
 
-  const db = getDatabase();
-  const storage = getStorage();
-
+  
   // Handle input changes
   const handleChange = (e) => {
     setItem({ ...item, [e.target.name]: e.target.value });
@@ -98,32 +101,45 @@ const AddItem = () => {
     }
   };
   
-  
+  const getApiKey = async () => {
+    const apiKeyRef = ref(db, "config/remove_bg_api_key");
+    try {
+      const snapshot = await get(apiKeyRef);
+      if (snapshot.exists()) {
+        return snapshot.val(); // ✅ API Key retrieved
+      } else {
+        console.error("API Key not found in Firebase");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching API Key:", error);
+      return null;
+    }
+  };
 
-  // Handle Image Upload
+  // 🔥 Handle Image Upload with RemoveBG API
   const handleImageUpload = async (file) => {
     if (!file) {
       alert("Please select an image file.");
       return;
     }
-  
+
     if (!file.type.startsWith("image/")) {
       alert("Invalid file type. Please select an image.");
       return;
     }
-  
-    const apiKey = import.meta.env.VITE_REMOVE_BG_API_KEY;
+
+    const apiKey = await getApiKey(); // 🔥 Get API Key dynamically
     if (!apiKey) {
-      console.error("RemoveBG API Key is missing! Check your .env setup.");
+      alert("API Key missing. Please check Firebase Database.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("image_file", file);
     formData.append("size", "auto");
-  
+
     try {
-      // Send image to remove.bg API
       const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
         headers: {
           "X-Api-Key": apiKey,
@@ -131,21 +147,22 @@ const AddItem = () => {
         },
         responseType: "blob",
       });
-  
+
       // Create a new file from the response
       const removedBgFile = new File([response.data], "removed-bg.png", { type: "image/png" });
-  
-      // Upload the cleaned image to Firebase
+
+      // Upload the cleaned image to Firebase Storage
       const imageRef = storageRef(storage, `clothing/${removedBgFile.name}`);
       await uploadBytes(imageRef, removedBgFile);
       const downloadUrl = await getDownloadURL(imageRef);
-  
+
       setItem({ ...item, imageUrl: downloadUrl });
     } catch (error) {
       console.error("Error removing background:", error);
       alert("Failed to remove background. Please try again.");
     }
   };
+  
   
   
   // Save to Firebase
@@ -167,51 +184,48 @@ const AddItem = () => {
   
     const userId = user.uid; // Get user's unique ID
   
-    const newItemRef = push(ref(db, "clothing")); // Keep all items under "clothing"
+    // ✅ Save item to "clothing" collection and get the ID
+    const newItemRef = push(ref(db, "clothing"));
     await set(newItemRef, { 
       ...item, 
       createdAt: Date.now(),
-      userId: userId // ✅ Associate item with the user
+      userId: userId
     });
-
-    // Reference to the user's closet array
-    const userRef = ref(db, `users/${userId}`);
-
+  
+    const clothingId = newItemRef.key; // ✅ Get the newly created clothing item's ID
+  
+    // ✅ Append clothingId to user's clothing array in "users" collection
+    const userClothingRef = ref(db, `users/${userId}/clothing`);
+    
     try {
-        // Retrieve existing closet array
-        const snapshot = await get(child(userRef, "closet"));
-        let closetArray = snapshot.exists() ? snapshot.val() : [];
-
-        // Ensure it's an array before pushing
-        if (!Array.isArray(closetArray)) {
-            closetArray = [];
+      const snapshot = await get(userClothingRef);
+      if (snapshot.exists()) {
+        const existingClothing = snapshot.val();
+        if (!existingClothing.includes(clothingId)) {
+          await set(userClothingRef, [...existingClothing, clothingId]); // Append new clothing ID
         }
-
-        // Append the new clothing ID
-        closetArray.push(newItemRef.key);
-
-        // Update the user's closet
-        await update(userRef, { closet: closetArray });
-
-        // Show success modal
-        setShowSuccessModal(true);
-
-        // Reset form
-        setItem({
-            name: "",
-            category: "",
-            subcategory: "",
-            brand: "",
-            size: "",
-            color: "",
-            imageUrl: "",
-        });
-
+      } else {
+        await set(userClothingRef, [clothingId]); // Initialize array if it doesn't exist
+      }
     } catch (error) {
-        console.error("Error updating closet:", error);
-        alert("Failed to update closet. Please try again.");
+      console.error("Error updating user clothing list:", error);
     }
+  
+    // Show success modal
+    setShowSuccessModal(true);
+  
+    // Reset form
+    setItem({
+      name: "",
+      category: "",
+      subcategory: "",
+      brand: "",
+      size: "",
+      color: "",
+      imageUrl: "",
+    });
   };
+  
   
 
 

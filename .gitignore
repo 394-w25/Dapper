@@ -8,9 +8,6 @@
 .runtimeconfig.json
 .firebase/
 
-.env
-
-
 ### macOS ###
 # General
 .DS_Store

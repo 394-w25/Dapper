@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
 import ClosetPage from './pages/Closet/ClosetPage';
-import AddItem from './pages/Closet/Add-Items/AddItem';  // ✅ Import AddItem Page
 import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
@@ -34,7 +33,6 @@ const App = () => {
           <div className="main-content">
             <Routes>
               <Route path="/" element={<ClosetPage />} />
-              <Route path="/add-item" element={<AddItem />} /> 
               <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/discover" element={<DiscoverPage />} />

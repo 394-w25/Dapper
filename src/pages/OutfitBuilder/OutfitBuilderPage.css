@@ -1,4 +1,131 @@
-.outfitbuilder {
-    text-align: center;
+.outfit-builder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #faf8fc;
+    font-family: Arial, sans-serif;
+    height: 100vh;
     padding: 20px;
+}
+
+.outfitbuilder-content {
+    padding-top: 70px;
+}
+
+.outfit-preview {
+    width: 100%;
+    height: 250px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.outfit-palette {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.outfit-item-img {
+    max-width: 100px;
+    max-height: 100px;
+    margin: 5px;
+}
+
+.outfit-item {
+    position: relative;
+}
+  
+.delete-item {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    color: red;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.categories {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    justify-content: flex-start;
+    scroll-behavior: smooth;
+    gap: 10px;
+}
+
+.category-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+}
+
+.category-button svg {
+    font-size: 20px;
+}
+
+.card-group-wrapper {
+    display: flex;
+    justify-content: start;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 10px;
+}
+
+.clothing-card-group {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.clothing-option {
+    width: 100px;
+    height: 100px;
+    cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.clothing-option:hover {
+    transform: scale(1.05);
+}
+
+.clothing-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.footer-button {
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px;
+    border: none;
+    background-color: #000;
+    color: white;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
 }

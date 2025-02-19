@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import Header from "../../components/header/Header";
 import { Form, Button, Container, Card, Modal, ListGroup } from "react-bootstrap";
 import { getDatabase, ref, push, set, get } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
+import "./AddItem.css";
 import axios from "axios";
 
 
@@ -55,21 +57,21 @@ const db = getDatabase();
 const storage = getStorage();
 
 
-  
-const AddItem = () => {
-  const [item, setItem] = useState({
-    name: "",
-    category: "",
-    subcategory: "",
-    brand: "",
-    size: "",
-    color: "",
-    imageUrl: "",
-  });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
+const AddItem = () => {
+    const [item, setItem] = useState({
+        name: "",
+        category: "",
+        subcategory: "",
+        brand: "",
+        size: "",
+        color: "",
+        imageUrl: "",
+    });
+
+    const [imageFile, setImageFile] = useState(null);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
 
   
   // Handle input changes
@@ -77,7 +79,7 @@ const AddItem = () => {
     setItem({ ...item, [e.target.name]: e.target.value });
   };
 
-  const [imageUrlInput, setImageUrlInput] = useState(""); // ✅ Fix for undefined variable
+    const [imageUrlInput, setImageUrlInput] = useState(""); // ✅ Fix for undefined variable
 
   const handleUrlUpload = async () => {
     if (!imageUrlInput.trim()) return; // Prevent empty input
@@ -229,183 +231,185 @@ const AddItem = () => {
   
 
 
-  return (
-    <Container className="mt-4">
-      <Card className="p-4 shadow-sm">
-        <h2 className="text-center">New Item</h2>
+    return (
+        <div>
+            <Header title="New Item" />
+            <Container className="add-item-container mt-4">
+                <Card className="p-4 shadow-sm">
 
-        {/* Image Upload Options */}
-<Form.Group controlId="imageUpload" className="mb-3">
-  {item.imageUrl ? (
-    <>
-      {/* Display Uploaded Image */}
-      <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded mb-2" />
-      <Button
-        variant="danger"
-        className="w-100 mb-2"
-        onClick={() => {
-          setImageFile(null);
-          setItem({ ...item, imageUrl: "" });
-        }}
-      >
-        Remove Image
-      </Button>
-    </>
-  ) : (
-    <>
-      {/* ✅ Take a Photo (Opens Camera Directly) */}
-     
-
-      {/* ✅ Upload from Device Storage */}
-      <Form.Group controlId="galleryUpload" className="mb-3">
-        <Form.Label>Upload from Gallery</Form.Label>
-        <Form.Control
-          type="file"
-          accept="image/*"
-          onClick={(e) => (e.target.value = null)}
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) handleImageUpload(file);
-          }}
-        />
-      </Form.Group>
-    </>
-  )}
-</Form.Group>
-
-{/* ✅ Hide "Upload from URL" when an image is uploaded */}
-{!item.imageUrl && (
-  <Form.Group className="mb-3">
-    <Form.Label>Upload from URL</Form.Label>
-    <Form.Control
-      type="text"
-      placeholder="Paste image link (Instagram, Twitter, etc.)"
-      value={imageUrlInput}
-      onChange={(e) => setImageUrlInput(e.target.value)}
-    />
-    <Button
-      variant="secondary"
-      className="mt-2 w-100"
-      onClick={handleUrlUpload}
-      disabled={!imageUrlInput.trim()}
-    >
-      Upload from Link
-    </Button>
-  </Form.Group>
-)}
+                    {/* Image Upload Options */}
+                    <Form.Group controlId="imageUpload" className="mb-3">
+                        {item.imageUrl ? (
+                            <>
+                                {/* Display Uploaded Image */}
+                                <img src={item.imageUrl} alt="Uploaded" className="w-100 rounded mb-2" />
+                                <Button
+                                    variant="danger"
+                                    className="w-100 mb-2"
+                                    onClick={() => {
+                                        setImageFile(null);
+                                        setItem({ ...item, imageUrl: "" });
+                                    }}
+                                >
+                                    Remove Image
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                {/* ✅ Take a Photo (Opens Camera Directly) */}
 
 
+                                {/* ✅ Upload from Device Storage */}
+                                <Form.Group controlId="galleryUpload" className="mb-3">
+                                    <Form.Label>Upload from Gallery</Form.Label>
+                                    <Form.Control
+                                        type="file"
+                                        accept="image/*"
+                                        onClick={(e) => (e.target.value = null)}
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) handleImageUpload(file);
+                                        }}
+                                    />
+                                </Form.Group>
+                            </>
+                        )}
+                    </Form.Group>
 
-        {/* Form Fields */}
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label>Item Name</Form.Label>
-            <Form.Control type="text" name="name" value={item.name} onChange={handleChange} />
-          </Form.Group>
+                    {/* ✅ Hide "Upload from URL" when an image is uploaded */}
+                    {!item.imageUrl && (
+                        <Form.Group className="mb-3">
+                            <Form.Label>Upload from URL</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Paste image link (Instagram, Twitter, etc.)"
+                                value={imageUrlInput}
+                                onChange={(e) => setImageUrlInput(e.target.value)}
+                            />
+                            <Button
+                                variant="secondary"
+                                className="mt-2 w-100"
+                                onClick={handleUrlUpload}
+                                disabled={!imageUrlInput.trim()}
+                            >
+                                Upload from Link
+                            </Button>
+                        </Form.Group>
+                    )}
 
-          {/* Category Selection - Opens Modal */}
-          <Form.Group className="mb-3">
-            <Form.Label>Category</Form.Label>
-            <Button variant="outline-dark" className="w-100" onClick={() => setShowCategoryModal(true)}>
-              {item.category || "Select Category"}
-            </Button>
-          </Form.Group>
 
-          {/* Subcategory Selection - Opens Modal */}
-          {item.category && (
-            <Form.Group className="mb-3">
-              <Form.Label>Subcategory</Form.Label>
-              <Button variant="outline-dark" className="w-100" onClick={() => setShowSubcategoryModal(true)}>
-                {item.subcategory || "Select Subcategory"}
-              </Button>
-            </Form.Group>
-          )}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Brand</Form.Label>
-            <Form.Control type="text" name="brand" value={item.brand} onChange={handleChange} />
-          </Form.Group>
+                    {/* Form Fields */}
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Item Name</Form.Label>
+                            <Form.Control type="text" name="name" value={item.name} onChange={handleChange} />
+                        </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Size</Form.Label>
-            <Form.Control type="text" name="size" value={item.size} onChange={handleChange} />
-          </Form.Group>
+                        {/* Category Selection - Opens Modal */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Category</Form.Label>
+                            <Button variant="outline-dark" className="w-100" onClick={() => setShowCategoryModal(true)}>
+                                {item.category || "Select Category"}
+                            </Button>
+                        </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Color</Form.Label>
-            <Form.Control type="text" name="color" value={item.color} onChange={handleChange} />
-          </Form.Group>
+                        {/* Subcategory Selection - Opens Modal */}
+                        {item.category && (
+                            <Form.Group className="mb-3">
+                                <Form.Label>Subcategory</Form.Label>
+                                <Button variant="outline-dark" className="w-100" onClick={() => setShowSubcategoryModal(true)}>
+                                    {item.subcategory || "Select Subcategory"}
+                                </Button>
+                            </Form.Group>
+                        )}
 
-          {/* Save Button */}
-          <Button variant="primary" className="w-100 mt-3" onClick={handleSave}>
-            Create Item
-          </Button>
-        </Form>
-      </Card>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Brand</Form.Label>
+                            <Form.Control type="text" name="brand" value={item.brand} onChange={handleChange} />
+                        </Form.Group>
 
-      {/* Category Selection Modal */}
-      <Modal show={showCategoryModal} onHide={() => setShowCategoryModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Select Category</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ListGroup>
-            {Object.keys(categories).map((category) => (
-              <ListGroup.Item
-                key={category}
-                action
-                onClick={() => {
-                  setItem({ ...item, category, subcategory: "" });
-                  setShowCategoryModal(false);
-                }}
-              >
-                {category}
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        </Modal.Body>
-      </Modal>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Size</Form.Label>
+                            <Form.Control type="text" name="size" value={item.size} onChange={handleChange} />
+                        </Form.Group>
 
-      {/* Subcategory Selection Modal */}
-      <Modal show={showSubcategoryModal} onHide={() => setShowSubcategoryModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Select Subcategory</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ListGroup>
-            {categories[item.category]?.map((subcategory) => (
-              <ListGroup.Item
-                key={subcategory}
-                action
-                onClick={() => {
-                  setItem({ ...item, subcategory });
-                  setShowSubcategoryModal(false);
-                }}
-              >
-                {subcategory}
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        </Modal.Body>
-      </Modal>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Color</Form.Label>
+                            <Form.Control type="text" name="color" value={item.color} onChange={handleChange} />
+                        </Form.Group>
 
-      {/* Success Modal */}
-    <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
-    <Modal.Header closeButton>
-        <Modal.Title>Item Added Successfully</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-        <p>Your item has been added to the closet successfully!</p>
-    </Modal.Body>
-    <Modal.Footer>
-        <Button variant="primary" onClick={() => setShowSuccessModal(false)}>
-        OK
-        </Button>
-    </Modal.Footer>
-    </Modal>
+                        {/* Save Button */}
+                        <Button variant="primary" className="w-100 mt-3" onClick={handleSave}>
+                            Create Item
+                        </Button>
+                    </Form>
+                </Card>
 
-    </Container>
-  );
+                {/* Category Selection Modal */}
+                <Modal show={showCategoryModal} onHide={() => setShowCategoryModal(false)} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Select Category</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ListGroup>
+                            {Object.keys(categories).map((category) => (
+                                <ListGroup.Item
+                                    key={category}
+                                    action
+                                    onClick={() => {
+                                        setItem({ ...item, category, subcategory: "" });
+                                        setShowCategoryModal(false);
+                                    }}
+                                >
+                                    {category}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Modal.Body>
+                </Modal>
+
+                {/* Subcategory Selection Modal */}
+                <Modal show={showSubcategoryModal} onHide={() => setShowSubcategoryModal(false)} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Select Subcategory</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ListGroup>
+                            {categories[item.category]?.map((subcategory) => (
+                                <ListGroup.Item
+                                    key={subcategory}
+                                    action
+                                    onClick={() => {
+                                        setItem({ ...item, subcategory });
+                                        setShowSubcategoryModal(false);
+                                    }}
+                                >
+                                    {subcategory}
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Modal.Body>
+                </Modal>
+
+                {/* Success Modal */}
+                <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Item Added Successfully</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>Your item has been added to the closet successfully!</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={() => setShowSuccessModal(false)}>
+                            OK
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+            </Container>
+        </div>
+    );
 };
 
 export default AddItem;

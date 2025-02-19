@@ -16,6 +16,7 @@ import html2canvas from 'html2canvas';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRef } from 'react';
 import DomToImage from 'dom-to-image';
+import CustomModal from '../../components/modal/CustomModal';
 
 const categories = [
   { name: 'All', icon: <TbHanger /> },
@@ -90,7 +91,17 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
   };
 
   const saveOutfit = async () => {
-    if (!user || outfitItems.length === 0 || !outfitName) return;
+    if (!user) return;
+
+    if (!outfitName) {
+      alert("Please enter a name for the outfit.");
+      return
+    }
+
+    if (outfitItems.length === 0) {
+      alert("Please add items to the outfit.");
+      return
+    }
 
     try {
       const outfitId = push(ref(database, 'outfits')).key;
@@ -217,44 +228,38 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
           </Col>
         </Row>
 
-        <Row className="mt-4">
-          <Col>
-            <div className="footer">
-              {showSaveInput ? (
-                <div className="save-input-section">
-                  <input
-                    type="text"
-                    placeholder="Outfit Name"
-                    value={outfitName}
-                    onChange={(e) => setOutfitName(e.target.value)}
-                    className="save-input"
-                  />
-                  <div className="save-btn-group">
-                    <button className="save-confirm-btn" onClick={saveOutfit}>
-                      <FiSave className="btn-icon" /> Confirm
-                    </button>
-                    <button
-                      className="save-cancel-btn"
-                      onClick={() => {
-                        setShowSaveInput(false);
-                        setOutfitName("");
-                      }}
-                    >
-                      <FiX className="btn-icon" /> Cancel
-                    </button>
-                  </div>
-                </div>
+        {/* Save Outfit Modal */}
+        <CustomModal show={showSaveInput} onClose={() => setShowSaveInput(false)} title="Save Outfit">
+          <Form>
+            <Form.Group>
+              <Form.Label>Outfit Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={outfitName}
+                onChange={(e) => setOutfitName(e.target.value)}
+                placeholder="Enter outfit name"
+              />
+            </Form.Group>
+          </Form>
+          <div className="footer-buttons">
+            <Button variant="secondary" onClick={() => setShowSaveInput(false)} className="save-cancel-button">
+              <FiX /> Cancel
+            </Button>
+            <Button variant="primary" onClick={saveOutfit} className="footer-button">
+              <FiSave /> Confirm
+            </Button>
+          </div>
+        </CustomModal>
 
-              ) : (
-                <div className="footer-buttons">
-                  <button className="footer-button" onClick={() => setShowSaveInput(true)}>
-                    <FiSave /> Save Outfit
-                  </button>
-                  <button className="footer-button" onClick={handleGetFeedback}>
-                    <FiMessageSquare /> Get Feedback
-                  </button>
-                </div>
-              )}
+        <Row className="mt-4">
+          <Col className="footer">
+            <div className="footer-buttons">
+              <button className="footer-button" onClick={() => setShowSaveInput(true)}>
+                <FiSave /> Save Outfit
+              </button>
+              <button className="footer-button" onClick={handleGetFeedback}>
+                <FiMessageSquare /> Get Feedback
+              </button>
             </div>
           </Col>
         </Row>

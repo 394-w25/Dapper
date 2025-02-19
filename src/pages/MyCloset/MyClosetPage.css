@@ -6,7 +6,7 @@
 }
 
 .mycloset-content {
-    padding-top: 80px;
+    padding-top: 50px;
 }
 
 .category-filter-container {
@@ -22,7 +22,7 @@
 .category-filter {
     display: inline-flex;
     gap: 10px;
-    padding: 0 15px;
+    padding: 0 0px;
 }
 
 .category-filter-container::-webkit-scrollbar {
@@ -39,10 +39,6 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-}
-
-.clothing-grid {
-    margin-top: 20px;
 }
 
 .clothing-item {

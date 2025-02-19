@@ -12,6 +12,10 @@ import { TbHanger } from "react-icons/tb";
 import { PiPantsFill } from "react-icons/pi";
 import { GiRunningShoe } from "react-icons/gi";
 import { FiMinusCircle, FiSave, FiMessageSquare, FiX } from 'react-icons/fi';
+import html2canvas from 'html2canvas';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRef } from 'react';
+import DomToImage from 'dom-to-image';
 
 const categories = [
   { name: 'All', icon: <TbHanger /> },
@@ -21,17 +25,46 @@ const categories = [
   { name: 'Accessories', icon: <FaBagShopping /> }
 ];
 
-const OutfitBuilderPage = () => {
+const OutfitBuilderPage = ({ selectedOutfitId }) => {
   const [user] = useAuthState();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [outfitItems, setOutfitItems] = useState([]);
   const [clothingItems, setClothingItems] = useState([]);
   const [clickedItems, setClickedItems] = useState(new Set());
-  const [showModal, setShowModal] = useState(false);
   const [outfitName, setOutfitName] = useState("");
+  const [recentOutfits, setRecentOutfits] = useState([]);
+  const outfitPaletteRef = useRef(null);
   const [showSaveInput, setShowSaveInput] = useState(false);
-
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
+  const storage = getStorage();
+
+  useEffect(() => {
+    if (selectedOutfitId) {
+      loadOutfit(selectedOutfitId);
+    }
+    fetchRecentOutfits();
+  }, [selectedOutfitId]);
+
+  const fetchRecentOutfits = async () => {
+    if (!user) return;
+
+    try {
+      const outfitsRef = ref(database, 'outfits');
+      const snapshot = await get(outfitsRef);
+
+      if (snapshot.exists()) {
+        const outfitsData = snapshot.val();
+        const userOutfits = Object.values(outfitsData)
+          .filter(outfit => outfit.createdBy === user.uid) // Get only the current user's outfits
+          .sort((a, b) => b.createdAt - a.createdAt) // Sort by creation date (most recent first)
+          .slice(0, 4); // Get the latest 5 outfits
+
+        setRecentOutfits(userOutfits);
+      }
+    } catch (error) {
+      console.error("Error fetching recent outfits:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchClothingDetails = async () => {
@@ -79,56 +112,51 @@ const OutfitBuilderPage = () => {
     setOutfitItems(outfitItems.filter(item => item.id !== itemToRemove.id));
   };
 
-  const saveOutfit = () => {
-    if (!user || outfitItems.length === 0 || !outfitName) return; // Ensure user, outfitItems, and name are valid
+  const saveOutfit = async () => {
+    if (!user || outfitItems.length === 0 || !outfitName) return;
 
-    // Generate a unique outfit ID using Firebase push
-    const outfitId = push(ref(database, 'outfits')).key;
-    const clothingIDs = outfitItems.map(item => item.id);
+    try {
+      const outfitId = push(ref(database, 'outfits')).key;
+      const clothingIDs = outfitItems.map(item => item.id);
 
-    // Prepare the outfit data
-    const outfitData = {
-      outfitId: outfitId,
-      clothingIDs: clothingIDs,
-      createdAt: Date.now(),
-      createdBy: user.uid,
-      imageUrl: "placeholder", // Placeholder for an outfit image
-      name: outfitName,
-      sharedWith: []
-    };
+      // Ensure images are loaded
+      const images = outfitPaletteRef.current.querySelectorAll('img');
+      await Promise.all([...images].map(img => new Promise(resolve => {
+        if (img.complete) resolve();
+        img.onload = resolve;
+      })));
 
-    // Save outfit to Firebase
-    set(ref(database, `outfits/${outfitId}`), outfitData)
-      .then(() => {
-        console.log('Outfit saved successfully');
+      // Convert the outfit preview to an image
+      const dataUrl = await DomToImage.toPng(outfitPaletteRef.current);
 
-        // Add the outfitId to the user's outfits array
-        const userOutfitsRef = ref(database, `users/${user.uid}/outfits`);
+      // Convert dataUrl to Blob
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
 
-        // Fetch the existing outfits for the user
-        get(userOutfitsRef)
-          .then(snapshot => {
-            const currentOutfits = snapshot.exists() ? snapshot.val() : [];
-            const updatedOutfits = [...currentOutfits, outfitId];
+      // Upload to Firebase Storage
+      const imageRef = storageRef(storage, `outfits/${outfitId}.png`);
+      await uploadBytes(imageRef, blob);
+      const imageUrl = await getDownloadURL(imageRef);
 
-            set(userOutfitsRef, updatedOutfits)
-              .then(() => {
-                console.log("Outfit added to user's outfits list");
-                setShowModal(false);
-                setOutfitName("");
-                setShowSaveInput(false);
-              })
-              .catch(error => {
-                console.error("Error updating user's outfits:", error);
-              });
-          })
-          .catch(error => {
-            console.error("Error fetching user's outfits:", error);
-          });
-      })
-      .catch(error => {
-        console.error("Error saving outfit:", error);
+      // Save to Firebase Database
+      await set(ref(database, `outfits/${outfitId}`), {
+        outfitId,
+        clothingIDs,
+        createdAt: Date.now(),
+        createdBy: user.uid,
+        imageUrl,
+        name: outfitName,
+        sharedWith: []
       });
+
+      setShowSaveInput(false);
+      setOutfitName("");
+
+      console.log("Outfit saved successfully!");
+
+    } catch (error) {
+      console.error("Error saving outfit:", error);
+    }
   };
 
   const handleClick = (item) => {
@@ -155,7 +183,7 @@ const OutfitBuilderPage = () => {
       <Container className="outfitbuilder-content">
         <Row className="mb-4">
           <Col>
-            <div className="outfit-preview" onDrop={handleDrop} onDragOver={handleDragOver}>
+            <div className="outfit-preview" ref={outfitPaletteRef} onDrop={handleDrop} onDragOver={handleDragOver}>
               <div className="outfit-palette">
                 {outfitItems.map((item, index) => (
                   <div
@@ -216,30 +244,30 @@ const OutfitBuilderPage = () => {
           <Col>
             <div className="footer">
               {showSaveInput ? (
-               <div className="save-input-section">
-               <input
-                 type="text"
-                 placeholder="Outfit Name"
-                 value={outfitName}
-                 onChange={(e) => setOutfitName(e.target.value)}
-                 className="save-input"
-               />
-               <div className="save-btn-group">
-                 <button className="save-confirm-btn" onClick={saveOutfit}>
-                   <FiSave className="btn-icon" /> Confirm
-                 </button>
-                 <button
-                   className="save-cancel-btn"
-                   onClick={() => {
-                     setShowSaveInput(false);
-                     setOutfitName("");
-                   }}
-                 >
-                   <FiX className="btn-icon" /> Cancel
-                 </button>
-               </div>
-             </div>
-             
+                <div className="save-input-section">
+                  <input
+                    type="text"
+                    placeholder="Outfit Name"
+                    value={outfitName}
+                    onChange={(e) => setOutfitName(e.target.value)}
+                    className="save-input"
+                  />
+                  <div className="save-btn-group">
+                    <button className="save-confirm-btn" onClick={saveOutfit}>
+                      <FiSave className="btn-icon" /> Confirm
+                    </button>
+                    <button
+                      className="save-cancel-btn"
+                      onClick={() => {
+                        setShowSaveInput(false);
+                        setOutfitName("");
+                      }}
+                    >
+                      <FiX className="btn-icon" /> Cancel
+                    </button>
+                  </div>
+                </div>
+
               ) : (
                 <div className="footer-buttons">
                   <button className="footer-button" onClick={() => setShowSaveInput(true)}>
@@ -254,29 +282,6 @@ const OutfitBuilderPage = () => {
           </Col>
         </Row>
       </Container>
-
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Enter Outfit Name</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="outfitName">
-              <Form.Label>Outfit Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter outfit name"
-                value={outfitName}
-                onChange={(e) => setOutfitName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={saveOutfit}>Save</Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

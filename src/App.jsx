@@ -4,6 +4,7 @@ import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
 import ClosetPage from './pages/Closet/ClosetPage';
 import MyClosetPage from './pages/MyCloset/MyClosetPage';
+import AddItem from './pages/Add-Items/AddItem';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import ProfilePage from './pages/Profile/ProfilePage';
@@ -34,6 +35,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<ClosetPage />} />
               <Route path="/mycloset" element={<MyClosetPage />} />
+              <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/outfit-builder" element={<OutfitBuilder />} />

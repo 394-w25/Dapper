@@ -18,7 +18,7 @@ const NavigationBar = () => {
             <i className="bi bi-compass-fill"></i>
             <p>Discover</p>
           </Nav.Link>
-          <Nav.Link as={NavLink} to="/outfit-builder" className="nav-icon" activeclassname="active">
+          <Nav.Link as={NavLink} to="/add-item" className="nav-icon" activeclassname="active">
             <i className="bi bi-plus-circle-fill"></i>
             <p>Add</p>
           </Nav.Link>

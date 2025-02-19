@@ -14,6 +14,10 @@ const ClosetPage = () => {
       <Button variant="primary" onClick={() => navigate('/mycloset')}>
         My Closet
       </Button>
+
+      <Button variant="success" onClick={() => navigate('/outfit-builder')}>
+        Build Outfit
+      </Button>
     </div>
   );
 };

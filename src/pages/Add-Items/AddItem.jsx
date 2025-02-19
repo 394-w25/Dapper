@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Card, Modal, ListGroup } from "react-bootstrap";
-import { getDatabase, ref, push, set } from "firebase/database";
+import { getDatabase, ref, push, set, get, child, update } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import axios from "axios";
@@ -173,20 +173,44 @@ const AddItem = () => {
       createdAt: Date.now(),
       userId: userId // ✅ Associate item with the user
     });
-  
-    // Show success modal
-    setShowSuccessModal(true);
-  
-    // Reset form
-    setItem({
-      name: "",
-      category: "",
-      subcategory: "",
-      brand: "",
-      size: "",
-      color: "",
-      imageUrl: "",
-    });
+
+    // Reference to the user's closet array
+    const userRef = ref(db, `users/${userId}`);
+
+    try {
+        // Retrieve existing closet array
+        const snapshot = await get(child(userRef, "closet"));
+        let closetArray = snapshot.exists() ? snapshot.val() : [];
+
+        // Ensure it's an array before pushing
+        if (!Array.isArray(closetArray)) {
+            closetArray = [];
+        }
+
+        // Append the new clothing ID
+        closetArray.push(newItemRef.key);
+
+        // Update the user's closet
+        await update(userRef, { closet: closetArray });
+
+        // Show success modal
+        setShowSuccessModal(true);
+
+        // Reset form
+        setItem({
+            name: "",
+            category: "",
+            subcategory: "",
+            brand: "",
+            size: "",
+            color: "",
+            imageUrl: "",
+        });
+
+    } catch (error) {
+        console.error("Error updating closet:", error);
+        alert("Failed to update closet. Please try again.");
+    }
   };
   
 

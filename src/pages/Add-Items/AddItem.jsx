@@ -100,7 +100,6 @@ const AddItem = () => {
   
   
 
-
   // Handle Image Upload
   const handleImageUpload = async (file) => {
     if (!file) {

@@ -2,7 +2,7 @@
     text-align: center;
     padding: 10px;
     background-color: #f8f9fa;
-    min-height: 100vh;
+    min-height: 100%;
 }
 
 .mycloset-content {
@@ -34,19 +34,12 @@
     scrollbar-width: none;
 }
 
-.category-filter button {
-    flex: 0 0 auto;
+.category-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 12px;
-    border-radius: 20px;
-    transition: all 0.2s ease-in-out;
 }
-
-.category-filter button.active,
-.category-filter button:hover {
-    background-color: black;
-    color: white;
-}
-
 
 .clothing-grid {
     margin-top: 20px;

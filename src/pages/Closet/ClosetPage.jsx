@@ -25,9 +25,9 @@ const ClosetPage = () => {
         if (snapshot.exists()) {
           const outfitsData = snapshot.val();
           const userOutfits = Object.values(outfitsData)
-            .filter(outfit => outfit.createdBy === user.uid) 
-            .sort((a, b) => b.createdAt - a.createdAt) 
-            .slice(0, 4); 
+            .filter(outfit => outfit.createdBy === user.uid)
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice(0, 4);
 
           setRecentOutfits(userOutfits);
         }
@@ -47,7 +47,7 @@ const ClosetPage = () => {
       </div>
 
       <div className="action-grid">
-        <button 
+        <button
           className="action-button blue"
           onClick={() => navigate('/outfit-builder')}
         >
@@ -65,7 +65,7 @@ const ClosetPage = () => {
           <span>Find Clothing</span>
         </button>
 
-        <button 
+        <button
           className="action-button purple"
           onClick={() => navigate('/mycloset')}
         >
@@ -88,9 +88,9 @@ const ClosetPage = () => {
                 </div>
               </div>
             ))
-          ) : (
-            <p>No recent outfits found.</p>
-          )}
+          ) : [...Array(3)].map((_, index) => (
+            <div key={index} className="outfit-placeholder"></div>
+          ))}
         </div>
       </div>
     </div>

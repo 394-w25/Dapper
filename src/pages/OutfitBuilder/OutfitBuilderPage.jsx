@@ -32,7 +32,6 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
   const [clothingItems, setClothingItems] = useState([]);
   const [clickedItems, setClickedItems] = useState(new Set());
   const [outfitName, setOutfitName] = useState("");
-  const [recentOutfits, setRecentOutfits] = useState([]);
   const outfitPaletteRef = useRef(null);
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
@@ -42,29 +41,7 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
     if (selectedOutfitId) {
       loadOutfit(selectedOutfitId);
     }
-    fetchRecentOutfits();
   }, [selectedOutfitId]);
-
-  const fetchRecentOutfits = async () => {
-    if (!user) return;
-
-    try {
-      const outfitsRef = ref(database, 'outfits');
-      const snapshot = await get(outfitsRef);
-
-      if (snapshot.exists()) {
-        const outfitsData = snapshot.val();
-        const userOutfits = Object.values(outfitsData)
-          .filter(outfit => outfit.createdBy === user.uid) // Get only the current user's outfits
-          .sort((a, b) => b.createdAt - a.createdAt) // Sort by creation date (most recent first)
-          .slice(0, 4); // Get the latest 5 outfits
-
-        setRecentOutfits(userOutfits);
-      }
-    } catch (error) {
-      console.error("Error fetching recent outfits:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchClothingDetails = async () => {

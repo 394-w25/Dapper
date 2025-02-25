@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react';
 import Header from "../../components/header/Header";
 import { useNavigate } from 'react-router-dom';
 import { get, ref } from "firebase/database";
-import { useDbData, useAuthState } from "../../utilities/firebase";
+import { useAuthState } from "../../utilities/firebase";
 import { database } from "../../utilities/firebase";
 import './ClosetPage.css';
 import { TbHanger } from "react-icons/tb";
 import { FaTshirt } from 'react-icons/fa';
 import { BsSearch, BsCloudUpload } from 'react-icons/bs';
+import FeedbackRequestModal from '../Feedback/FeedbackRequestModal';
 
 const ClosetPage = () => {
   const navigate = useNavigate();
   const [user] = useAuthState();
   const [recentOutfits, setRecentOutfits] = useState([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedOutfitId, setSelectedOutfitId] = useState(null);
 
   useEffect(() => {
     const fetchOutfits = async () => {
@@ -39,6 +42,12 @@ const ClosetPage = () => {
     fetchOutfits();
   }, [user]);
 
+  // Open the feedback request modal
+  const openFeedbackRequest = (outfitId) => {
+    setSelectedOutfitId(outfitId);
+    setShowFeedbackModal(true);
+  };
+
   return (
     <div className="closet">
       <Header title="Closet" />
@@ -47,10 +56,7 @@ const ClosetPage = () => {
       </div>
 
       <div className="action-grid">
-        <button
-          className="action-button blue"
-          onClick={() => navigate('/outfit-builder')}
-        >
+        <button className="action-button blue" onClick={() => navigate('/outfit-builder')}>
           <FaTshirt className="action-icon" />
           <span>Create Outfit</span>
         </button>
@@ -65,10 +71,7 @@ const ClosetPage = () => {
           <span>Find Clothing</span>
         </button>
 
-        <button
-          className="action-button purple"
-          onClick={() => navigate('/mycloset')}
-        >
+        <button className="action-button purple" onClick={() => navigate('/mycloset')}>
           <TbHanger className="action-icon" />
           <span>Browse Closet</span>
         </button>
@@ -85,6 +88,9 @@ const ClosetPage = () => {
                 </div>
                 <div className="outfit-info">
                   <p className="outfit-name">{outfit.name}</p>
+                  <button className="feedback-button" onClick={() => openFeedbackRequest(outfit.outfitId)}>
+                    Get Feedback
+                  </button>
                 </div>
               </div>
             ))
@@ -93,6 +99,13 @@ const ClosetPage = () => {
           ))}
         </div>
       </div>
+
+      {showFeedbackModal && (
+        <FeedbackRequestModal
+          outfitId={selectedOutfitId}
+          onClose={() => setShowFeedbackModal(false)}
+        />
+      )}
     </div>
   );
 };

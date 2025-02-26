@@ -1,4 +1,4 @@
-.modal-overlay {
+.feedback-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,7 +11,7 @@
     z-index: 999;
   }
   
-  .modal-content {
+  .feedback-modal-content {
     background: #fff;
     padding: 20px;
     border-radius: 6px;

@@ -12,6 +12,7 @@ import OutfitFeedbackPage from './pages/Feedback/OutfitFeedback';
 import SuggestionModal from './pages/Feedback/SuggestionModal';
 import ProfilePage from './pages/Profile/ProfilePage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
+import HomePage from './pages/Home/HomePage';
 import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
 import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
@@ -36,7 +37,7 @@ const App = () => {
         <>
           <div className="main-content">
             <Routes>
-              <Route path="/" element={<ClosetPage />} />
+              <Route path="/" element={<HomePage user={user}/>} />
               <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />

@@ -309,7 +309,7 @@ const OutfitBuilderPage = () => {
           </div>
         </CustomModal>
 
-        <Row className="mt-4">
+        <Row>
           <Col className="footer">
             <div className="footer-buttons">
               <button className="footer-button" onClick={() => setShowSaveInput(true)}>

@@ -234,9 +234,9 @@ const AddItem = () => {
 
 
   return (
-    <div>
+    <div className="add-item-container">
       <Header title="New Item" />
-      <Container className="add-item-container mt-4">
+      <Container className="mt-4">
         <Card className="p-4 shadow-sm">
 
           {/* Image Upload Options */}

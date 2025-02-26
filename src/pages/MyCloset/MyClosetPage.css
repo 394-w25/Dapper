@@ -6,12 +6,21 @@
 }
 
 .category-filter-container {
-    margin-top: 50px;
+    margin-top: -25px;
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
     padding: 10px 0;
     display: flex;
+    justify-content: flex-start;
+    scroll-behavior: smooth;
+}
+.top-level-filter-container {
+    margin-top: 60px;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
     justify-content: flex-start;
     scroll-behavior: smooth;
 }

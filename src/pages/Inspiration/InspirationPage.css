@@ -1,0 +1,59 @@
+.inspiration-container {
+    padding-top: 80px;
+}
+
+.inspiration-page {
+    background: #fff;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 60px;
+}
+
+.inspiration-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.action-button {
+    flex: 1;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-button:first-child {
+    margin-right: 10px;
+}
+
+.folder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.folder-item:hover {
+    background: #e9ecef;
+}
+
+.folder-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    color: #6c757d;
+}

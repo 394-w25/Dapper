@@ -155,8 +155,8 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
   
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="feedback-modal-overlay">
+      <div className="feedback-modal-content">
         <h2>Request Feedback</h2>
         <div className="tabs">
           <button className={tab === "friends" ? "active" : ""} onClick={() => setTab("friends")}>

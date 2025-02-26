@@ -65,7 +65,7 @@
 }
 
 .action-icon {
-  font-size: 22px;
+  font-size: 18px;
   gap: 10px;
 }
 
@@ -116,8 +116,9 @@
   left: 39.8%;
 }
 
-.modal-title {
+.customize-modal-title {
   font-size: 20px;
+  align-items: left;
 }
 
 .save-button {

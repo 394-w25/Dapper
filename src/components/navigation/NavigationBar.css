@@ -79,13 +79,13 @@
     align-items: center;
 }
 
-.modal-body {
+.nav-modal-body {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
   
-  .customize-modal {
+  .nav-modal {
     width: 300px;
     height: 150px;
     display: flex !important;
@@ -97,7 +97,9 @@
     left: 39.8%;
   }
   
-  .modal-title {
+  .nav-modal-title {
     font-size: 20px;
+    align-items: left;
+    justify-content: left;
   }
   

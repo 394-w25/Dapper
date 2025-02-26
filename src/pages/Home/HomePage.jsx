@@ -67,8 +67,8 @@ const HomePage = ({ user }) => {
       </div>
 
       <Modal show={showCustomizeModal} onHide={() => setShowCustomizeModal(false)} dialogClassName="customize-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Customize Home Screen</Modal.Title>
+        <Modal.Header closeButton >
+          <Modal.Title className="customize-modal-title">Customize Home Screen</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {actions.map((action) => (

@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { get, ref, remove } from "firebase/database";
 import { useDbData, useAuthState } from "../../utilities/firebase";
 import { database } from "../../utilities/firebase";
-import './ClosetPage.css';
 import { TbHanger } from "react-icons/tb";
 import { FaTshirt } from 'react-icons/fa';
 import { BsSearch, BsCloudUpload } from 'react-icons/bs';

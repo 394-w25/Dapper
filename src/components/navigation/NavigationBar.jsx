@@ -53,11 +53,11 @@ const NavigationBar = () => {
       </Navbar>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={handleClose} centered dialogClassName="customize-modal">
+      <Modal show={showModal} onHide={handleClose} centered dialogClassName="nav-modal">
         <Modal.Header closeButton>
-          <Modal.Title>Add Item</Modal.Title>
+          <Modal.Title className="nav-modal-title">Add Item</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="nav-modal-body">
           <Button
             variant="secondary"
             className="w-100 mb-2"

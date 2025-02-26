@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
+import ChatScreen from './pages/Chat/ChatScreen';
+import ClosetPage from './pages/Closet/ClosetPage';
 import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import AddItem from './pages/Add-Items/AddItem';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
+import OutfitFeedbackPage from './pages/Feedback/OutfitFeedback';
+import SuggestionModal from './pages/Feedback/SuggestionModal';
 import ProfilePage from './pages/Profile/ProfilePage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import HomePage from './pages/Home/HomePage';
@@ -37,6 +41,9 @@ const App = () => {
               <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/chat/:chatId" element={<ChatScreen />} />  {/* ✅ Correct Route */}
+              <Route path="/outfit-feedback/:outfitId" element={<OutfitFeedbackPage />} />
+              <Route path="/review-edits/:chatId" element={<SuggestionModal />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/outfit-builder" element={<OutfitBuilder />} />
               <Route path="/profile" element={<ProfilePage />} />

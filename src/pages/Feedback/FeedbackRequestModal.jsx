@@ -102,21 +102,57 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
       alert("Please select a friend to request feedback.");
       return;
     }
+  
     try {
-      const feedbackRef = push(ref(db, "feedback_requests"));
-      await set(feedbackRef, {
-        outfitId: outfit.outfitId,
-        senderId: user.uid,
-        receiverId: selectedFriendId,
-        status: "pending",
-        createdAt: Date.now(),
-      });
-      alert("Feedback request sent!");
-      onClose();
+      const chatRef = ref(db, "chats");
+      const snapshot = await get(chatRef);
+  
+      let existingChatId = null;
+      
+      // Check if a chat already exists between these users for this outfit
+      if (snapshot.exists()) {
+        const chats = snapshot.val();
+        Object.entries(chats).forEach(([chatId, chatData]) => {
+          if (
+            chatData.outfitId === outfitId &&
+            chatData.users[user.uid] &&
+            chatData.users[selectedFriendId]
+          ) {
+            existingChatId = chatId;
+          }
+        });
+      }
+  
+      // If chat does not exist, create a new one
+      if (!existingChatId) {
+        const newChatRef = push(ref(db, "chats"));
+        const newChatId = newChatRef.key;
+  
+        await set(newChatRef, {
+          outfitId: outfitId,
+          users: {
+            [user.uid]: true,
+            [selectedFriendId]: true
+          },
+          messages: {
+            [push(ref(db, `chats/${newChatId}/messages`)).key]: {
+              senderId: user.uid,
+              text: "Check out this outfit!",
+              timestamp: Date.now(),
+            }
+          }
+        });
+  
+        existingChatId = newChatId;
+      }
+  
+      alert("Feedback request sent! Your friend can now chat with you.");
+      onClose(); // Close the modal
     } catch (error) {
       console.error("Error sending feedback request:", error);
     }
   };
+  
 
   return (
     <div className="modal-overlay">

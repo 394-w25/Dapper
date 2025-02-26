@@ -99,7 +99,10 @@ const ClosetPage = () => {
           <span>Create Outfit</span>
         </button>
 
-        <button className="action-button green">
+        <button
+          className="action-button green"
+          onClick={() => navigate('/inspiration/upload')}
+        >
           <BsCloudUpload className="action-icon" />
           <span>Upload Inspiration</span>
         </button>
@@ -126,7 +129,7 @@ const ClosetPage = () => {
               <div key={outfit.outfitId} className="outfit-card">
                 <div className="outfit-image-wrapper">
                   <img src={outfit.imageUrl} alt={outfit.name} className="outfit-image" />
-                  <button 
+                  <button
                     className="edit-button"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -135,7 +138,7 @@ const ClosetPage = () => {
                   >
                     <FiEdit2 />
                   </button>
-                  <button 
+                  <button
                     className="delete-button"
                     onClick={(e) => handleDeleteClick(e, outfit)}
                   >
@@ -154,9 +157,9 @@ const ClosetPage = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <CustomModal 
-        show={showDeleteModal} 
-        onClose={cancelDelete} 
+      <CustomModal
+        show={showDeleteModal}
+        onClose={cancelDelete}
         title="Delete Outfit"
       >
         <div className="delete-modal-content">

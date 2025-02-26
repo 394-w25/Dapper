@@ -8,6 +8,8 @@ import AddItem from './pages/Add-Items/AddItem';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import ProfilePage from './pages/Profile/ProfilePage';
+import UploadInspirationPage from './pages/Inspiration/UploadInspirationPage';
+import UploadDetailsPage from './pages/Inspiration/UploadDetailsPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
 import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
@@ -35,6 +37,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<ClosetPage />} />
               <Route path="/mycloset" element={<MyClosetPage />} />
+              <Route path="/inspiration/upload" element={<UploadInspirationPage />} />
+              <Route path="/inspiration/upload/details" element={<UploadDetailsPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/discover" element={<DiscoverPage />} />

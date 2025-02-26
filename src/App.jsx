@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignIn/SignInPage';
 import ChatPage from './pages/Chat/ChatPage';
-import ClosetPage from './pages/Closet/ClosetPage';
 import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import AddItem from './pages/Add-Items/AddItem';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
+import HomePage from './pages/Home/HomePage';
 import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
 import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
@@ -33,7 +33,7 @@ const App = () => {
         <>
           <div className="main-content">
             <Routes>
-              <Route path="/" element={<ClosetPage />} />
+              <Route path="/" element={<HomePage user={user}/>} />
               <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />

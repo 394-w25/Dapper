@@ -38,37 +38,3 @@
 .upload-option svg {
     margin-bottom: 5px;
 }
-
-/* Bottom Navigation */
-.bottom-nav {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background: #f8f9fa;
-    border-top: 1px solid #ddd;
-    position: absolute;
-    bottom: 75px;
-}
-
-.nav-button {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.nav-button svg {
-    margin-right: 2px;
-}
-
-.nav-button:first-child {
-    margin-right: 10px;
-}
-
-.nav-button.active {
-    background-color: black;
-    color: white;
-}

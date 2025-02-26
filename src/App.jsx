@@ -11,6 +11,8 @@ import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import OutfitFeedbackPage from './pages/Feedback/OutfitFeedback';
 import SuggestionModal from './pages/Feedback/SuggestionModal';
 import ProfilePage from './pages/Profile/ProfilePage';
+import InspirationPage from './pages/Inspiration/InspirationPage';
+import FindInspirationPage from './pages/Inspiration/FindInspirationPage';
 import UploadInspirationPage from './pages/Inspiration/UploadInspirationPage';
 import UploadDetailsPage from './pages/Inspiration/UploadDetailsPage';
 import NotFoundPage from './pages/NotFound/NotFoundPage';
@@ -41,6 +43,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage user={user}/>} />
               <Route path="/mycloset" element={<MyClosetPage />} />
+              <Route path="/inspiration" element={<InspirationPage />} />
+              <Route path="/inspiration/find" element={<FindInspirationPage />} />
               <Route path="/inspiration/upload" element={<UploadInspirationPage />} />
               <Route path="/inspiration/upload/details" element={<UploadDetailsPage />} />
               <Route path="/add-item" element={<AddItem />} />

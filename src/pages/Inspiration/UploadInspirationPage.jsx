@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import InspirationFooter from "../../components/inspiration/InspirationFooter";
+import BackButton from "../../components/inspiration/BackButton";
 import { Button, Container } from "react-bootstrap";
 import { FaCamera, FaImages } from "react-icons/fa";
 import { BsInstagram, BsPinterest, BsReddit, BsGlobe } from "react-icons/bs";
@@ -17,6 +19,8 @@ const UploadInspirationPage = () => {
 
     return (
         <div className="upload-inspiration">
+            <BackButton to="/inspiration" />
+
             <Header title="Upload Inspiration" />
             <Container className="upload-container">
                 <div className="upload-grid">
@@ -47,16 +51,7 @@ const UploadInspirationPage = () => {
                 </div>
             </Container>
 
-            <div className="bottom-nav">
-                <Button variant="outline-dark" className="nav-button">
-                    <FaSearch size={20} />
-                    Find Inspiration
-                </Button>
-                <Button variant="dark" className="nav-button active">
-                    <FaUpload size={20} />
-                    Upload Inspiration
-                </Button>
-            </div>
+            <InspirationFooter activePage="upload" />
         </div>
     );
 };

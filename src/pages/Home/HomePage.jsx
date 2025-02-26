@@ -16,7 +16,7 @@ const HomePage = ({ user }) => {
     { id: 1, name: "My Closet", link: "mycloset", icon: <FaTshirt />, visible: true },
     { id: 2, name: "Outfit History", link: "myoutfits", icon: <BsClockHistory />, visible: true }, // aidan change the link here once the outfits page is done
     { id: 3, name: "Chat History", link: "chat", icon: <BsChatDots />, visible: true },
-    { id: 4, name: "My Inspiration", link: "discover", icon: <BsLightbulb />, visible: true },
+    { id: 4, name: "My Inspiration", link: "inspiration", icon: <BsLightbulb />, visible: true },
     { id: 5, name: "My Friends", link: "chat", icon: <FaUserFriends />, visible: true },
     { id: 6, name: "My Feed", link: "discover", icon: <BsCompass />, visible: true },
   ]);

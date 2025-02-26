@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
+import BackButton from "../../components/inspiration/BackButton";
 import { Container, Button, Form } from "react-bootstrap";
 import { FaArrowLeft, FaCamera, FaRedo } from "react-icons/fa";
 import Webcam from "react-webcam";
@@ -93,11 +94,7 @@ const UploadDetailsPage = () => {
 
     return (
         <div className="upload-details">
-            <div className="back-button-container">
-                <Button variant="light" className="back-button" onClick={() => navigate("/inspiration/upload")}>
-                    <FaArrowLeft size={19} />
-                </Button>
-            </div>
+            <BackButton to="/inspiration/upload" />
 
             <Header title="Upload Details" />
             <Container className="details-container">

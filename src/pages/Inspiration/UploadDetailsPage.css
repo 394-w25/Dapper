@@ -7,33 +7,6 @@
     justify-content: space-between;
 }
 
-.back-button-container {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    position: absolute;
-    top: -5px;
-    left: -10px;
-    z-index: 10;
-}
-
-.back-button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 16px;
-    font-weight: 500;
-    border: none;
-    background: none;
-    color: #333;
-}
-
-.back-button:hover {
-    color: #000;
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-
 .image-preview {
     display: flex;
     flex-direction: column;

@@ -1,8 +1,206 @@
 .discover {
     text-align: center;
     padding: 20px;
-}
-
-.discover-content {
-    padding-top: 80px;
-}
+    background-color: #faf8fc;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  /* Header section with search & concepts */
+  .discover-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px; /* space below the main Header component */
+    width: 100%;
+    position: relative;
+  }
+  
+  /* Search icon container (shown if search bar is not open) */
+  .search-icon-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 95%;
+    margin: 0 auto;
+  }
+  
+  .search-icon {
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  /* Full-width search container (shown if search is toggled) */
+  .search-container {
+    display: flex;
+    align-items: center;
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  /* Big wide search bar */
+  .search-bar {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .close-search-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  /* Concepts container below search bar */
+  .concepts-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    justify-content: center;
+  }
+  
+  .concept-item {
+    background-color: #f0eef1;
+    border-radius: 25px;
+    padding: 8px 16px;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  
+  .concept-item.selected {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  /* Main feed content */
+  .discover-content {
+    padding-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+  }
+  
+  .feed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Each post card */
+  .feed-card {
+    background-color: #f0eef1;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+    position: relative;
+  }
+  
+  .feed-card-title {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+  }
+  
+  /* If the outfit has an image */
+  .feed-card-image img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+  
+  /* Collage container for items if there's no main outfit image */
+  .collage-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 5px;
+  }
+  
+  .collage-item img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  
+  /* Action buttons row */
+  .action-buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .like-button,
+  .dislike-button,
+  .cart-button,
+  .stack-button {
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  /* Expanded item list */
+  .expanded-item-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .expanded-item {
+    background-color: #e2e2e2;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Undo popup */
+  .undo-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 999;
+  }
+  
+  .undo-popup button {
+    background-color: #fff;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  /* Modal content for item */
+  .item-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .item-modal-content img {
+    max-width: 80%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  

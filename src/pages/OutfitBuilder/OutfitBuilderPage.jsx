@@ -5,7 +5,7 @@ import { Container, ButtonGroup, Button, Row, Col, Card, Nav, Modal, Form } from
 import Header from "../../components/header/Header";
 import { useDbData, useAuthState } from "../../utilities/firebase";
 import { database } from "../../utilities/firebase";
-import { ref, get, push, set } from 'firebase/database';
+import { ref, get, push, set, update } from 'firebase/database';
 import { FaTshirt } from 'react-icons/fa';
 import { FaBagShopping } from 'react-icons/fa6';
 import { TbHanger } from "react-icons/tb";
@@ -17,6 +17,7 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 import { useRef } from 'react';
 import DomToImage from 'dom-to-image';
 import CustomModal from '../../components/modal/CustomModal';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const categories = [
   { name: 'All', icon: <TbHanger /> },
@@ -26,23 +27,31 @@ const categories = [
   { name: 'Accessories', icon: <FaBagShopping /> }
 ];
 
-const OutfitBuilderPage = ({ selectedOutfitId }) => {
+const OutfitBuilderPage = () => {
   const [user] = useAuthState();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [outfitItems, setOutfitItems] = useState([]);
   const [clothingItems, setClothingItems] = useState([]);
   const [clickedItems, setClickedItems] = useState(new Set());
   const [outfitName, setOutfitName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentOutfitId, setCurrentOutfitId] = useState(null);
   const outfitPaletteRef = useRef(null);
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
   const storage = getStorage();
-
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   useEffect(() => {
-    if (selectedOutfitId) {
-      loadOutfit(selectedOutfitId);
+    // Check if we have an outfit ID in the location state (for editing)
+    if (location.state && location.state.editOutfitId) {
+      const outfitId = location.state.editOutfitId;
+      setCurrentOutfitId(outfitId);
+      setIsEditing(true);
+      loadOutfit(outfitId);
     }
-  }, [selectedOutfitId]);
+  }, [location]);
 
   useEffect(() => {
     const fetchClothingDetails = async () => {
@@ -65,6 +74,35 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
 
     fetchClothingDetails();
   }, [userData]);
+
+  const loadOutfit = async (outfitId) => {
+    try {
+      const outfitRef = ref(database, `outfits/${outfitId}`);
+      const snapshot = await get(outfitRef);
+
+      if (snapshot.exists()) {
+        const outfitData = snapshot.val();
+        setOutfitName(outfitData.name);
+
+        // Load each clothing item in the outfit
+        const outfitClothingItems = [];
+        for (const clothingId of outfitData.clothingIDs) {
+          const clothingRef = ref(database, `clothing/${clothingId}`);
+          const clothingSnapshot = await get(clothingRef);
+
+          if (clothingSnapshot.exists()) {
+            outfitClothingItems.push({ id: clothingId, ...clothingSnapshot.val() });
+          }
+        }
+
+        setOutfitItems(outfitClothingItems);
+      } else {
+        console.error("Outfit not found");
+      }
+    } catch (error) {
+      console.error("Error loading outfit:", error);
+    }
+  };
 
   const handleDragStart = (event, item) => {
     event.dataTransfer.setData('clothingItem', JSON.stringify(item));
@@ -95,16 +133,16 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
 
     if (!outfitName) {
       alert("Please enter a name for the outfit.");
-      return
+      return;
     }
 
     if (outfitItems.length === 0) {
       alert("Please add items to the outfit.");
-      return
+      return;
     }
 
     try {
-      const outfitId = push(ref(database, 'outfits')).key;
+      // Get clothing IDs from the outfit items
       const clothingIDs = outfitItems.map(item => item.id);
 
       // Ensure images are loaded
@@ -121,26 +159,46 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
       const response = await fetch(dataUrl);
       const blob = await response.blob();
 
+      // If editing, use the existing outfit ID, otherwise create a new one
+      const outfitIdToUse = isEditing ? currentOutfitId : push(ref(database, 'outfits')).key;
+
       // Upload to Firebase Storage
-      const imageRef = storageRef(storage, `outfits/${outfitId}.png`);
+      const imageRef = storageRef(storage, `outfits/${outfitIdToUse}.png`);
       await uploadBytes(imageRef, blob);
       const imageUrl = await getDownloadURL(imageRef);
 
-      // Save to Firebase Database
-      await set(ref(database, `outfits/${outfitId}`), {
-        outfitId,
+      // Create outfit data object
+      const outfitData = {
+        outfitId: outfitIdToUse,
         clothingIDs,
-        createdAt: Date.now(),
-        createdBy: user.uid,
         imageUrl,
         name: outfitName,
         sharedWith: []
-      });
+      };
+
+      // If editing, maintain the creation details but update the modification time
+      if (isEditing) {
+        outfitData.updatedAt = Date.now();
+      } else {
+        outfitData.createdAt = Date.now();
+        outfitData.createdBy = user.uid;
+      }
+
+      // Save to Firebase Database
+      if (isEditing) {
+        await update(ref(database, `outfits/${outfitIdToUse}`), outfitData);
+        console.log("Outfit updated successfully!");
+      } else {
+        await set(ref(database, `outfits/${outfitIdToUse}`), outfitData);
+        console.log("Outfit saved successfully!");
+      }
 
       setShowSaveInput(false);
-      setOutfitName("");
-
-      console.log("Outfit saved successfully!");
+      
+      // Navigate back to the home page where closet is located
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 100);
 
     } catch (error) {
       console.error("Error saving outfit:", error);
@@ -167,7 +225,7 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
 
   return (
     <div className="outfit-builder">
-      <Header title="New Outfit" />
+      <Header title={isEditing ? "Edit Outfit" : "New Outfit"} />
       <Container className="outfitbuilder-content">
         <Row className="mb-4">
           <Col>
@@ -229,7 +287,7 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
         </Row>
 
         {/* Save Outfit Modal */}
-        <CustomModal show={showSaveInput} onClose={() => setShowSaveInput(false)} title="Save Outfit">
+        <CustomModal show={showSaveInput} onClose={() => setShowSaveInput(false)} title={isEditing ? "Update Outfit" : "Save Outfit"}>
           <Form>
             <Form.Group>
               <Form.Label>Outfit Name</Form.Label>
@@ -246,7 +304,7 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
               <FiX /> Cancel
             </Button>
             <Button variant="primary" onClick={saveOutfit} className="footer-button">
-              <FiSave /> Confirm
+              <FiSave /> {isEditing ? "Update" : "Save"}
             </Button>
           </div>
         </CustomModal>
@@ -255,10 +313,13 @@ const OutfitBuilderPage = ({ selectedOutfitId }) => {
           <Col className="footer">
             <div className="footer-buttons">
               <button className="footer-button" onClick={() => setShowSaveInput(true)}>
-                <FiSave /> Save Outfit
+                <FiSave /> {isEditing ? "Update Outfit" : "Save Outfit"}
               </button>
               <button className="footer-button" onClick={handleGetFeedback}>
                 <FiMessageSquare /> Get Feedback
+              </button>
+              <button className="footer-button cancel-button" onClick={() => window.location.replace('/')}>
+                <FiX /> Cancel
               </button>
             </div>
           </Col>

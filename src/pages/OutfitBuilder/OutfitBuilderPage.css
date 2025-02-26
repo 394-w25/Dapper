@@ -30,13 +30,13 @@
   
   @media (max-width: 768px) {
     .outfit-preview {
-      height: 200px;
+      height: 150px;
     }
   }
   
   @media (max-width: 576px) {
     .outfit-preview {
-      height: 180px;
+      height: 150px;
     }
   }
   

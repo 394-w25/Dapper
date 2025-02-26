@@ -1,8 +1,8 @@
 [
-    {
-      "origin": ["http://localhost:5173"],
-      "method": ["GET"],
-      "maxAgeSeconds": 3600,
-      "responseHeader": ["Content-Type"]
-    }
-  ]
+  {
+    "origin": ["http://localhost:5173", "https://dapperoutfitgenerator.web.app"],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type"]
+  }
+]

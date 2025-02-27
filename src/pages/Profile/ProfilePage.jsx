@@ -44,20 +44,20 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchClothingDetails = async () => {
       if (!userData || !userData.closet) return;
-  
+
       try {
         const clothingRefs = userData.closet.map((id) => ref(database, `clothing/${id}`));
         const clothingPromises = clothingRefs.map((clothingRef) => get(clothingRef));
         const clothingSnapshots = await Promise.all(clothingPromises);
-  
+
         const clothingDetails = clothingSnapshots
           .filter((snapshot) => snapshot.exists())
           .map((snapshot) => ({ id: snapshot.key, ...snapshot.val() }));
-  
+
         const recentClothing = clothingDetails
           .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, 3);
-  
+
         setRecentClothing(recentClothing);
       } catch (error) {
         console.error('Error fetching clothing details:', error);
@@ -66,27 +66,35 @@ const ProfilePage = () => {
     fetchClothingDetails();
   }, [userData]);
 
-  useEffect(() => { // herbert change the inspirations variables here if needed
+  useEffect(() => {
     const fetchInspirations = async () => {
-      if (!userData || !userData.inspirations) return;
+      if (!user) return;
 
-      const inspirationDetails = [];
-
-      for (const id of userData.inspirations) {
-        const inspirationRef = ref(database, `inspirations/${id}`);
-        const snapshot = await get(inspirationRef);
+      try {
+        const inspirationsRef = ref(database, `inspiration/${user.uid}/inspirations`);
+        const snapshot = await get(inspirationsRef);
 
         if (snapshot.exists()) {
-          inspirationDetails.push({ id: id, ...snapshot.val() });
+          const inspirationsData = snapshot.val();
+          const inspirationDetails = Object.keys(inspirationsData).map(id => ({
+            id,
+            ...inspirationsData[id],
+          }));
+
+          const recentInspiration = inspirationDetails
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice(0, 3);
+
+          setRecentInspirations(recentInspiration);
         }
+      } catch (error) {
+        console.error("Error fetching inspirations:", error);
       }
-      const recentInspiration = inspirationDetails.filter(inspiration => inspiration.createdBy === user.uid)
-        .sort((a, b) => b.createdAt - a.createdAt)
-        .slice(0, 3);
-      setRecentInspirations(recentInspiration);
     };
+
     fetchInspirations();
-  }, [userData]);
+  }, [user]);
+
 
   return (
     <div className="profile-page">
@@ -99,7 +107,7 @@ const ProfilePage = () => {
             className="rounded-circle"
             style={{ width: '40px', height: '40px', objectFit: 'cover' }}
           />
-          <span style={{ fontSize: '22px'}}>{userData?.displayName}</span>
+          <span style={{ fontSize: '22px' }}>{userData?.displayName}</span>
         </div>
 
         {/* Outfits Section */}
@@ -155,7 +163,7 @@ const ProfilePage = () => {
             <div className="outfit-grid">
               {recentInspirations.length > 0 ? (
                 recentInspirations.map(item => (
-                  <div key={item.id} className="outfit-card">
+                  <div key={item.id} className="inspiration-card-2">
                     <div className="outfit-image-wrapper">
                       <img src={item.imageUrl} alt={item.name} className="clothing-image" />
                     </div>

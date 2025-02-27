@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get, push, set, update } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
+import { useNavigate } from "react-router-dom";
+import UserSearchBar from "../Friends/UserSearchBar";
+
 import "./FeedbackRequestModal.css";
 
 const FeedbackRequestModal = ({ outfitId, onClose }) => {
   const [user] = useAuthState();
   const db = getDatabase();
+  const navigate = useNavigate();
 
   const [tab, setTab] = useState("friends"); // "friends", "addFriend", or "invite"
   const [friendsList, setFriendsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // For "Add Friend" flow
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
   // For selected friend
   const [selectedFriendId, setSelectedFriendId] = useState(null);
+
+  const [successMessage, setSuccessMessage] = useState("");  // ✅ State for success message
+
 
   // For invite link
   const inviteLink = `https://dapperoutfitgenerator.web.app/invite?outfitId=${outfitId || "error"}`;
@@ -55,103 +60,76 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
   };
   
   
+ // ✅ Send feedback request and show success message + redirect to chat
+ const sendFeedbackRequest = async () => {
+  if (!selectedFriendId) {
+    alert("Please select a friend to request feedback.");
+    return;
+  }
 
-  // 🔹 Search for a user to add as friend
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    try {
-      const usersRef = ref(db, "users");
-      const snapshot = await get(usersRef);
-      if (snapshot.exists()) {
-        const usersData = snapshot.val();
-        const results = Object.entries(usersData)
-          .filter(([uid, data]) => {
-            // Exclude current user
-            if (uid === user.uid) return false;
-            const usernameMatch = data.displayName?.toLowerCase().includes(searchQuery.toLowerCase());
-            const emailMatch = data.email?.toLowerCase().includes(searchQuery.toLowerCase());
-            return usernameMatch || emailMatch;
-          })
-          .map(([uid, data]) => ({ uid, ...data }));
+  try {
+    const chatRef = ref(db, "chats");
+    const snapshot = await get(chatRef);
+    let existingChatId = null;
+    let existingOutfitIds = [];
 
-        setSearchResults(results);
-      }
-    } catch (error) {
-      console.error("Error searching users:", error);
+    if (snapshot.exists()) {
+      const chats = snapshot.val();
+      Object.entries(chats).forEach(([chatId, chatData]) => {
+        if (chatData.users[user.uid] && chatData.users[selectedFriendId]) {
+          existingChatId = chatId;
+          existingOutfitIds = chatData.outfitIds || []; // Load existing outfits
+        }
+      });
     }
-  };
 
-  // 🔹 Add friend
-  const handleAddFriend = async (friendUid) => {
-    if (!user) return;
-    try {
-      // Update the user's friend list
-      const userFriendsRef = ref(db, `users/${user.uid}/friends`);
-      await update(userFriendsRef, { [friendUid]: true });
-      alert("Friend added!");
-      fetchFriends(); // Refresh the friends list
-      setTab("friends"); // Switch back to friend list
-    } catch (error) {
-      console.error("Error adding friend:", error);
-    }
-  };
-
-  // 🔹 Send feedback request to selected friend
-  const sendFeedbackRequest = async () => {
-    if (!selectedFriendId) {
-      alert("Please select a friend to request feedback.");
-      return;
-    }
-  
-    try {
-      const chatRef = ref(db, "chats");
-      const snapshot = await get(chatRef);
-  
-      let existingChatId = null;
-      
-      // Check if a chat already exists between these users for this outfit
-      if (snapshot.exists()) {
-        const chats = snapshot.val();
-        Object.entries(chats).forEach(([chatId, chatData]) => {
-          if (
-            chatData.outfitId === outfitId &&
-            chatData.users[user.uid] &&
-            chatData.users[selectedFriendId]
-          ) {
-            existingChatId = chatId;
-          }
-        });
-      }
-  
-      // If chat does not exist, create a new one
-      if (!existingChatId) {
-        const newChatRef = push(ref(db, "chats"));
-        const newChatId = newChatRef.key;
-  
-        await set(newChatRef, {
-          outfitId: outfitId,
-          users: {
-            [user.uid]: true,
-            [selectedFriendId]: true
+    if (!existingChatId) {
+      // Create a new chat if one doesn't exist
+      const newChatRef = push(ref(db, "chats"));
+      const newChatId = newChatRef.key;
+      await set(newChatRef, {
+        outfitIds: [outfitId],  // Store outfitId as an array
+        users: {
+          [user.uid]: true,
+          [selectedFriendId]: true,
+        },
+        messages: {
+          [push(ref(db, `chats/${newChatId}/messages`)).key]: {
+            senderId: user.uid,
+            text: "Check out this outfit!",
+            timestamp: Date.now(),
           },
-          messages: {
-            [push(ref(db, `chats/${newChatId}/messages`)).key]: {
-              senderId: user.uid,
-              text: "Check out this outfit!",
-              timestamp: Date.now(),
-            }
-          }
+        },
+      });
+      existingChatId = newChatId;
+    } else {
+      // If chat exists, add outfitId only if it's not already in the list
+      if (!existingOutfitIds.includes(outfitId)) {
+        const updatedOutfitIds = [...existingOutfitIds, outfitId];
+        await update(ref(db, `chats/${existingChatId}`), { outfitIds: updatedOutfitIds });
+
+        // Send a system message to notify the friend
+        const newMessageRef = push(ref(db, `chats/${existingChatId}/messages`));
+        await set(newMessageRef, {
+          senderId: "system",
+          text: "A new outfit was added to this chat for feedback!",
+          timestamp: Date.now(),
         });
-  
-        existingChatId = newChatId;
       }
-  
-      alert("Feedback request sent! Your friend can now chat with you.");
-      onClose(); // Close the modal
-    } catch (error) {
-      console.error("Error sending feedback request:", error);
     }
-  };
+
+    setSuccessMessage("Feedback request sent! Redirecting to chat...");
+
+    setTimeout(() => {
+      navigate(`/chat/${existingChatId}`);
+      onClose();
+    }, 2000);
+
+  } catch (error) {
+    console.error("Error sending feedback request:", error);
+  }
+};
+
   
 
   return (
@@ -172,54 +150,48 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
 
         {/* TAB: FRIENDS LIST */}
         {tab === "friends" && (
-          <>
-            {loading ? (
-              <p>Loading friends...</p>
-            ) : friendsList.length === 0 ? (
-              <p>No friends yet. Try adding one or share an invite link!</p>
-            ) : (
-                <div className="friends-list">
-                {friendsList.map((friend) => (
-                  <label key={friend.id} className="friend-item">
-                    <input
-                      type="radio"
-                      name="friend"
-                      value={friend.id}
-                      onChange={() => setSelectedFriendId(friend.id)}
-                    />
-                    <span>{friend.displayName}</span>
-                  </label>
-                ))}
-              </div>
-              
-            )}
-            {friendsList.length > 0 && (
-              <button className="send-btn" onClick={sendFeedbackRequest}>
-                Send Feedback Request
-              </button>
-            )}
-          </>
-        )}
+  <>
+    {loading ? (
+      <p>Loading friends...</p>
+    ) : friendsList.length === 0 ? (
+      <p>No friends yet. Try adding one or share an invite link!</p>
+    ) : (
+      <div className="friends-list">
+        {friendsList.map((friend) => (
+          <label key={friend.id} className="friend-item">
+            <div className="friend-avatar">
+              {friend.profilePic ? (
+                <img src={friend.profilePic} alt={friend.displayName} />
+              ) : (
+                <span>{friend.displayName.charAt(0)}</span>
+              )}
+            </div>
+            <span className="friend-name">{friend.displayName}</span>
+            <input
+              type="radio"
+              name="friend"
+              value={friend.id}
+              onChange={() => setSelectedFriendId(friend.id)}
+            />
+          </label>
+        ))}
+      </div>
+    )}
+    {friendsList.length > 0 && (
+      <button className="send-btn" onClick={sendFeedbackRequest}>
+        Send Feedback Request
+      </button>
+    )}
+  </>
+)}
 
-        {/* TAB: ADD FRIEND */}
+
+        {/* TAB: ADD FRIEND (✅ Uses UserSearchBar) */}
         {tab === "addFriend" && (
           <>
-            <input
-              type="text"
-              placeholder="Search by username or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button onClick={handleSearch}>Search</button>
+           <UserSearchBar searchResults={searchResults} setSearchResults={setSearchResults} fetchFriends={fetchFriends} />
 
-            <ul className="search-results">
-              {searchResults.map((result) => (
-                <li key={result.uid}>
-                  {result.username || "No Username"} ({result.email})
-                  <button onClick={() => handleAddFriend(result.uid)}>Add</button>
-                </li>
-              ))}
-            </ul>
+           
           </>
         )}
 

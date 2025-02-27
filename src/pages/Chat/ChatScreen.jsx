@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref, onValue, push, set } from "firebase/database";
+import { getDatabase, ref, onValue, push, set, get } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
 import { useParams, useNavigate } from "react-router-dom";
-import SuggestionModal from "../Feedback/SuggestionModal";  // ✅ Import SuggestionModal
+import SuggestionModal from "../Feedback/SuggestionModal";
+import OutfitPreviewModal from "./OutfitPreviewModal";
 import "./ChatScreen.css";
 
 const ChatScreen = () => {
@@ -11,40 +12,51 @@ const ChatScreen = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [outfit, setOutfit] = useState(null);
+  const [outfits, setOutfits] = useState([]);
+  const [outfitId, setOutfitId] = useState(null);
+
+  const [isOwner, setIsOwner] = useState(false);
+  const [showOutfitModal, setShowOutfitModal] = useState(false);
+  
+  // ✅ Define showSuggestionModal state to fix the error
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [suggestionId, setSuggestionId] = useState(null);
-  const [outfitId, setOutfitId] = useState(null);
-  const [isOwner, setIsOwner] = useState(false);  // ✅ Track if user is the outfit owner
+
   const db = getDatabase();
+
+
 
   useEffect(() => {
     if (!user || !chatId) return;
-
+  
     const chatRef = ref(db, `chats/${chatId}`);
-    onValue(chatRef, (snapshot) => {
+    onValue(chatRef, async (snapshot) => {
       if (snapshot.exists()) {
         const chatData = snapshot.val();
         setMessages(Object.values(chatData.messages || {}));
-
-        // Fetch outfit details using the outfitId stored in chatData
-        if (chatData.outfitId) {
-          setOutfitId(chatData.outfitId);  // ✅ Store outfitId globally
-          const outfitRef = ref(db, `outfits/${chatData.outfitId}`);
-          onValue(outfitRef, async (outfitSnapshot) => {
-            if (outfitSnapshot.exists()) {
-              const outfitData = outfitSnapshot.val();
-              console.log("Updated outfit detected:", outfitData);
-              setOutfit(outfitData);
-
-              // ✅ Check if the current user is the owner
-              setIsOwner(outfitData.createdBy === user.uid);
-            }
+  
+        if (chatData.outfitIds) {
+          const outfitPromises = chatData.outfitIds.map(async (outfitId) => {
+            const outfitRef = ref(db, `outfits/${outfitId}`);
+            const outfitSnapshot = await get(outfitRef);
+            return outfitSnapshot.exists() ? { ...outfitSnapshot.val(), id: outfitId } : null;
           });
+  
+          const outfitsData = await Promise.all(outfitPromises);
+          const validOutfits = outfitsData.filter(Boolean);
+          setOutfits(validOutfits);
+  
+          // ✅ Set outfitId when outfits are fetched
+          if (validOutfits.length > 0) {
+            setOutfitId(validOutfits[0].id);
+          }
+  
+          setIsOwner(validOutfits.some(outfit => outfit.createdBy === user.uid));
         }
       }
     });
   }, [user, chatId, db]);
+  
 
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -59,34 +71,19 @@ const ChatScreen = () => {
     setNewMessage("");
   };
 
-  const handleSuggestChanges = () => {
-    if (outfitId) {
-      navigate(`/outfit-feedback/${outfitId}`);
-    } else {
-      console.error("Outfit ID is missing!");
-    }
-  };
 
   return (
     <div className="chat-container">
       <h2>Chat</h2>
 
-      {outfit && (
-        <div className="outfit-preview">
-          <h3>Outfit Preview</h3>
-          <img src={outfit.imageUrl || "default-image.png"} alt={outfit.name || "Outfit"} />
-          
-          {/* ✅ Only show "Suggest Changes" if the current user is NOT the owner */}
-          {!isOwner && (
-            <button onClick={handleSuggestChanges}>Suggest Changes</button>
-          )}
-        </div>
-      )}
+      <button className="preview-outfits-btn" onClick={() => setShowOutfitModal(true)}>
+        Preview Outfits in this Chat
+      </button>
 
-<div className="chat-messages">
+      <div className="chat-messages">
         {messages.map((msg, index) => {
-          const isSystemMessage = msg.senderId === "system"; // ✅ Check if it's a system message
-          
+          const isSystemMessage = msg.senderId === "system";
+
           return (
             <div
               key={index}
@@ -100,8 +97,8 @@ const ChatScreen = () => {
               {isSystemMessage && msg.text.includes("suggested changes") && isOwner && (
                 <button
                   onClick={() => {
-                    setSuggestionId(msg.suggestionId);  // ✅ Set Suggestion ID
-                    setShowSuggestionModal(true);       // ✅ Show Modal
+                    setSuggestionId(msg.suggestionId);
+                    setShowSuggestionModal(true);
                   }}
                 >
                   Review Suggested Changes
@@ -122,8 +119,21 @@ const ChatScreen = () => {
         <button onClick={sendMessage}>Send</button>
       </div>
 
+      {/* ✅ Include Outfit Preview Modal */}
+      {showOutfitModal && (
+        <OutfitPreviewModal
+        show={showOutfitModal}
+        onClose={() => setShowOutfitModal(false)}
+        outfits={outfits}
+        navigate={navigate}
+        user={user} // ✅ Pass user to hide "Suggest Changes" button for the owner
+      />
+      
+      )}
+
       {/* ✅ Include Suggestion Modal */}
-      <SuggestionModal
+      {showSuggestionModal && (
+        <SuggestionModal 
         show={showSuggestionModal}
         onHide={() => setShowSuggestionModal(false)}
         suggestionId={suggestionId}
@@ -131,6 +141,8 @@ const ChatScreen = () => {
         chatId={chatId}      
         user={user}          
       />
+      
+      )}
     </div>
   );
 };

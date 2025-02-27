@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../../components/header/Header";
 import CustomModal from "../../components/modal/CustomModal";
+import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
 import { useDbData, useAuthState } from "../../utilities/firebase";
 import { database } from "../../utilities/firebase";
 import { ref, get, remove, update } from "firebase/database";
@@ -54,6 +55,15 @@ const MyClosetPage = () => {
       setSelectedTopFilter(location.state.selectedTopFilter);
     }
   }, [location]);
+  //feedback modals
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedOutfitId, setSelectedOutfitId] = useState(null);
+
+  const handleOpenFeedbackModal = (outfitId) => {
+    setSelectedOutfitId(outfitId);
+    setShowFeedbackModal(true);
+  };
+
 
   // On mount or when user data changes, fetch clothes & outfits
   useEffect(() => {
@@ -247,37 +257,32 @@ const MyClosetPage = () => {
 
       {/* Grid */}
       <Container className="mycloset-content">
-        <Row className="clothing-grid">
-          {itemsToDisplay.length > 0 ? (
-            itemsToDisplay.map((item, index) => (
-              <Col key={index} xs={6} className="mb-3">
-                <Card
-                  className="clothing-item"
-                  onClick={() => handleShowModal(item)}
-                >
-                  <div className="clothing-image-wrapper">
-                    <Card.Img
-                      variant="top"
-                      src={item.imageUrl}
-                      alt={item.name}
-                    />
-                    <button
-                      className="delete-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(item);
-                      }}
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </div>
-                </Card>
-              </Col>
-            ))
-          ) : (
-            <p className="no-items">No items to show</p>
-          )}
-        </Row>
+            <Row className="clothing-grid">
+        {itemsToDisplay.length > 0 ? (
+          itemsToDisplay.map((item, index) => (
+            <Col key={index} xs={6} className="mb-3">
+              <Card className="clothing-item">
+                <div className="clothing-image-wrapper" onClick={() => handleShowModal(item)}>
+                  <Card.Img variant="top" src={item.imageUrl} alt={item.name} />
+                </div>
+
+                {/* Show "Get Feedback" button only for outfits */}
+                {item.isOutfit && (
+                  <button 
+                    className="feedback-button" 
+                    onClick={() => handleOpenFeedbackModal(item.id)}
+                  >
+                    Get Feedback
+                  </button>
+                )}
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <p className="no-items">No items to show</p>
+        )}
+      </Row>
+
       </Container>
 
       {/* Item/Outfit Details Modal */}
@@ -355,7 +360,17 @@ const MyClosetPage = () => {
           </div>
         </div>
       </CustomModal>
+
+      {/* Feedback Request Modal */}
+    {showFeedbackModal && (
+      <FeedbackRequestModal 
+        outfitId={selectedOutfitId} 
+        onClose={() => setShowFeedbackModal(false)} 
+      />
+    )}
+
     </div>
+    
   );
 };
 

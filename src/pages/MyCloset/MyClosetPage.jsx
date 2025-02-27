@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../../components/header/Header";
 import CustomModal from "../../components/modal/CustomModal";
 import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
@@ -29,6 +30,9 @@ const topLevelFilters = [
 ];
 
 const MyClosetPage = () => {
+
+  const location = useLocation();
+
   const [user] = useAuthState();
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
 
@@ -45,6 +49,12 @@ const MyClosetPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
+  useEffect(() => {
+    // If we got a filter from navigation state, use it
+    if (location.state && location.state.selectedTopFilter) {
+      setSelectedTopFilter(location.state.selectedTopFilter);
+    }
+  }, [location]);
   //feedback modals
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedOutfitId, setSelectedOutfitId] = useState(null);

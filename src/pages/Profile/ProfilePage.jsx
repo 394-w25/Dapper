@@ -112,7 +112,7 @@ const ProfilePage = () => {
 
         {/* Outfits Section */}
         <Card className="section-cards">
-          <Card.Header className="section-card-header" onClick={() => navigate('/outfits')} style={{ cursor: "pointer" }}>
+          <Card.Header className="section-card-header" onClick={() => navigate('/mycloset', { state: { selectedTopFilter: 'Outfits' } })} style={{ cursor: "pointer" }}>
             Outfits
             <MdKeyboardArrowRight className="arrow-icon" />
           </Card.Header>
@@ -135,7 +135,7 @@ const ProfilePage = () => {
 
         {/* Clothing Section */}
         <Card className="section-cards">
-          <Card.Header className="section-card-header" onClick={() => navigate('/mycloset')} style={{ cursor: "pointer" }}>Clothing
+          <Card.Header className="section-card-header" onClick={() => navigate('/mycloset', { state: { selectedTopFilter: 'Clothing' } })} style={{ cursor: "pointer" }}>Clothing
             <MdKeyboardArrowRight className="arrow-icon" />
           </Card.Header>
           <Card.Body>
@@ -156,7 +156,7 @@ const ProfilePage = () => {
         </Card>
 
         <Card className="section-cards">
-          <Card.Header className="section-card-header" onClick={() => navigate('/inspiration')} style={{ cursor: "pointer" }}>Inspiration
+          <Card.Header className="section-card-header" onClick={() => navigate('/mycloset', { state: { selectedTopFilter: 'Inspiration' } })} style={{ cursor: "pointer" }}>Inspiration
             <MdKeyboardArrowRight className="arrow-icon" />
           </Card.Header>
           <Card.Body>

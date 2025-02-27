@@ -193,6 +193,8 @@ const OutfitBuilderPage = () => {
         console.log("Outfit saved successfully!");
       }
 
+      await set(ref(database, `users/${user.uid}/outfits/${outfitIdToUse}`), outfitData);
+      
       setShowSaveInput(false);
       
       // Navigate back to the home page where closet is located

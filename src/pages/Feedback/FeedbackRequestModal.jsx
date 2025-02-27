@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get, push, set, update } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
+import { useNavigate } from "react-router-dom";
 import UserSearchBar from "../Friends/UserSearchBar";
 
 import "./FeedbackRequestModal.css";
@@ -8,6 +9,7 @@ import "./FeedbackRequestModal.css";
 const FeedbackRequestModal = ({ outfitId, onClose }) => {
   const [user] = useAuthState();
   const db = getDatabase();
+  const navigate = useNavigate();
 
   const [tab, setTab] = useState("friends"); // "friends", "addFriend", or "invite"
   const [friendsList, setFriendsList] = useState([]);
@@ -15,11 +17,11 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
 
   const [searchResults, setSearchResults] = useState([]);
 
-
-
-
   // For selected friend
   const [selectedFriendId, setSelectedFriendId] = useState(null);
+
+  const [successMessage, setSuccessMessage] = useState("");  // ✅ State for success message
+
 
   // For invite link
   const inviteLink = `https://dapperoutfitgenerator.web.app/invite?outfitId=${outfitId || "error"}`;
@@ -58,62 +60,76 @@ const FeedbackRequestModal = ({ outfitId, onClose }) => {
   };
   
   
-  // 🔹 Send feedback request to selected friend
-  const sendFeedbackRequest = async () => {
-    if (!selectedFriendId) {
-      alert("Please select a friend to request feedback.");
-      return;
+ // ✅ Send feedback request and show success message + redirect to chat
+ const sendFeedbackRequest = async () => {
+  if (!selectedFriendId) {
+    alert("Please select a friend to request feedback.");
+    return;
+  }
+
+  try {
+    const chatRef = ref(db, "chats");
+    const snapshot = await get(chatRef);
+    let existingChatId = null;
+    let existingOutfitIds = [];
+
+    if (snapshot.exists()) {
+      const chats = snapshot.val();
+      Object.entries(chats).forEach(([chatId, chatData]) => {
+        if (chatData.users[user.uid] && chatData.users[selectedFriendId]) {
+          existingChatId = chatId;
+          existingOutfitIds = chatData.outfitIds || []; // Load existing outfits
+        }
+      });
     }
-  
-    try {
-      const chatRef = ref(db, "chats");
-      const snapshot = await get(chatRef);
-  
-      let existingChatId = null;
-      
-      // Check if a chat already exists between these users for this outfit
-      if (snapshot.exists()) {
-        const chats = snapshot.val();
-        Object.entries(chats).forEach(([chatId, chatData]) => {
-          if (
-            chatData.outfitId === outfitId &&
-            chatData.users[user.uid] &&
-            chatData.users[selectedFriendId]
-          ) {
-            existingChatId = chatId;
-          }
-        });
-      }
-  
-      // If chat does not exist, create a new one
-      if (!existingChatId) {
-        const newChatRef = push(ref(db, "chats"));
-        const newChatId = newChatRef.key;
-  
-        await set(newChatRef, {
-          outfitId: outfitId,
-          users: {
-            [user.uid]: true,
-            [selectedFriendId]: true
+
+    if (!existingChatId) {
+      // Create a new chat if one doesn't exist
+      const newChatRef = push(ref(db, "chats"));
+      const newChatId = newChatRef.key;
+      await set(newChatRef, {
+        outfitIds: [outfitId],  // Store outfitId as an array
+        users: {
+          [user.uid]: true,
+          [selectedFriendId]: true,
+        },
+        messages: {
+          [push(ref(db, `chats/${newChatId}/messages`)).key]: {
+            senderId: user.uid,
+            text: "Check out this outfit!",
+            timestamp: Date.now(),
           },
-          messages: {
-            [push(ref(db, `chats/${newChatId}/messages`)).key]: {
-              senderId: user.uid,
-              text: "Check out this outfit!",
-              timestamp: Date.now(),
-            }
-          }
+        },
+      });
+      existingChatId = newChatId;
+    } else {
+      // If chat exists, add outfitId only if it's not already in the list
+      if (!existingOutfitIds.includes(outfitId)) {
+        const updatedOutfitIds = [...existingOutfitIds, outfitId];
+        await update(ref(db, `chats/${existingChatId}`), { outfitIds: updatedOutfitIds });
+
+        // Send a system message to notify the friend
+        const newMessageRef = push(ref(db, `chats/${existingChatId}/messages`));
+        await set(newMessageRef, {
+          senderId: "system",
+          text: "A new outfit was added to this chat for feedback!",
+          timestamp: Date.now(),
         });
-  
-        existingChatId = newChatId;
       }
-  
-      alert("Feedback request sent! Your friend can now chat with you.");
-      onClose(); // Close the modal
-    } catch (error) {
-      console.error("Error sending feedback request:", error);
     }
-  };
+
+    setSuccessMessage("Feedback request sent! Redirecting to chat...");
+
+    setTimeout(() => {
+      navigate(`/chat/${existingChatId}`);
+      onClose();
+    }, 2000);
+
+  } catch (error) {
+    console.error("Error sending feedback request:", error);
+  }
+};
+
   
 
   return (

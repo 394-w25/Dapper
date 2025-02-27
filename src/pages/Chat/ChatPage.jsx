@@ -23,13 +23,18 @@ const ChatPage = () => {
           .filter(([chatId, chat]) => chat.users && chat.users[user.uid])
           .map(([chatId, chat]) => {
             const friendId = Object.keys(chat.users).find((uid) => uid !== user.uid);
+            const messages = Object.values(chat.messages || {});
+            const latestMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+
             return {
               id: chatId,
               friendName: chat.users[friendId]?.displayName || "Unknown User",
-              latestMessage: Object.values(chat.messages || {}).pop()?.text || "No messages yet",
-              outfitCount: chat.outfits ? Object.keys(chat.outfits).length : 0, // Count of outfits discussed
+              latestMessage: latestMessage?.text || "No messages yet",
+              timestamp: latestMessage?.timestamp || 0, // Use timestamp for sorting
+              outfitCount: chat.outfits ? Object.keys(chat.outfits).length : 0,
             };
-          });
+          })
+          .sort((a, b) => b.timestamp - a.timestamp); // ✅ Sort by newest first
 
         setChats(userChats);
       }

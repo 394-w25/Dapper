@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get, update, push, set } from "firebase/database";
 import { Modal, Button, Image, ListGroup } from "react-bootstrap";
 
+
 const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user }) => {
   const [suggestion, setSuggestion] = useState(null);
   const db = getDatabase();
@@ -24,31 +25,31 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
   }, [suggestionId, db]);
 
   const handleAccept = async () => {
-    if (!suggestion || !chatId || !user || !outfitId) {
+    if (!suggestion || !chatId || !user || !suggestion.outfitId) {
       console.warn("🚨 Missing required data:", { suggestion, chatId, user, outfitId });
       return;
     }
   
-    try {
-      console.log("🔄 Attempting to update outfit in Firebase...");
-      console.log("📌 Outfit ID:", outfitId);
-      console.log("📌 New Clothing IDs:", suggestion.clothingIDs);
+    const targetOutfitId = suggestion.outfitId; // ✅ Use the outfitId from suggestion
   
-      // ✅ Check if clothingIDs are valid before updating
+    try {
+     
+      // ✅ Ensure clothingIDs exist before updating
       if (!Array.isArray(suggestion.clothingIDs) || suggestion.clothingIDs.length === 0) {
         console.warn("⚠️ suggestion.clothingIDs is empty or not an array!");
         return;
       }
   
-      // ✅ Update the outfit in Firebase
-      await update(ref(db, `outfits/${outfitId}`), {
-        clothingIDs: [...suggestion.clothingIDs], // Ensure it's an array
+      // ✅ Update the outfit in Firebase with new clothingIDs
+      await update(ref(db, `outfits/${targetOutfitId}`), {
+        clothingIDs: suggestion.clothingIDs, // ✅ Properly replacing clothing IDs
+        imageUrl: suggestion.imageUrl, 
       });
   
       console.log("✅ Outfit updated successfully!");
   
-      // ✅ Fetch and log the updated outfit to verify
-      const updatedSnapshot = await get(ref(db, `outfits/${outfitId}`));
+      // ✅ Verify update by fetching the updated outfit
+      const updatedSnapshot = await get(ref(db, `outfits/${targetOutfitId}`));
       if (updatedSnapshot.exists()) {
         const updatedOutfit = updatedSnapshot.val();
         console.log("🔍 Updated Outfit Data:", updatedOutfit);
@@ -77,6 +78,7 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
       console.error("❌ Error updating outfit:", error);
     }
   };
+  
   
   
 

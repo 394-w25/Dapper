@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
 import { useNavigate } from "react-router-dom";
+import "./ChatPage.css"; 
 
 const ChatPage = () => {
   const [user] = useAuthState();
@@ -19,13 +20,16 @@ const ChatPage = () => {
       if (snapshot.exists()) {
         const chatData = snapshot.val();
         const userChats = Object.entries(chatData)
-          .filter(([chatId, chat]) => chat.users && chat.users[user.uid]) // ✅ Check if chat.users exists
-          .map(([chatId, chat]) => ({
-            id: chatId,
-            outfitId: chat.outfitId,
-            latestMessage: Object.values(chat.messages || {}).pop()?.text || "No messages yet",
-          }));
-
+          .filter(([chatId, chat]) => chat.users && chat.users[user.uid])
+          .map(([chatId, chat]) => {
+            const friendId = Object.keys(chat.users).find((uid) => uid !== user.uid);
+            return {
+              id: chatId,
+              friendName: chat.users[friendId]?.displayName || "Unknown User",
+              latestMessage: Object.values(chat.messages || {}).pop()?.text || "No messages yet",
+              outfitCount: chat.outfits ? Object.keys(chat.outfits).length : 0, // Count of outfits discussed
+            };
+          });
 
         setChats(userChats);
       }
@@ -35,15 +39,19 @@ const ChatPage = () => {
   }, [user, db]);
 
   return (
-    <div>
-      <h2>Chat List</h2>
-      <ul>
+    <div className="chat-list-container">
+      <h2 className="chat-list-title">Chats</h2>
+      <div className="chat-list">
         {chats.map((chat) => (
-          <li key={chat.id} onClick={() => navigate(`/chat/${chat.id}`)}>
-            Outfit ID: {chat.outfitId} - {chat.latestMessage}
-          </li>
+          <div key={chat.id} className="chat-card" onClick={() => navigate(`/chat/${chat.id}`)}>
+            <div className="chat-info">
+              <p className="chat-friend-name">{chat.friendName}</p>
+              <p className="chat-latest-message">{chat.latestMessage}</p>
+              {chat.outfitCount > 0 && <p className="chat-outfit-count">{chat.outfitCount} outfits under discussion</p>}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

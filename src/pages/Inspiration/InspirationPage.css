@@ -1,39 +1,54 @@
-.inspiration-container {
-    padding-top: 80px;
-}
-
-.inspiration-page {
+.main-inspiration {
     background: #fff;
     min-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding-bottom: 60px;
+    padding-bottom: 90px;
 }
 
+.inspiration-container {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Folder & View Buttons */
 .inspiration-actions {
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    max-width: 320px;
     margin-bottom: 15px;
 }
 
-.action-button {
-    flex: 1;
-    font-size: 14px;
+.folder-button,
+.view-button {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    width: 48%;
+    justify-content: center;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
-.action-button:first-child {
-    margin-right: 10px;
+.folder-button.active,
+.view-button.active {
+    background: black !important;
+    color: white !important;
+    border: none;
 }
 
+/* Folder List */
 .folder-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 15px;
+    gap: 5px;
 }
 
 .folder-item {
@@ -56,4 +71,156 @@
     margin-right: 10px;
     font-size: 18px;
     color: #6c757d;
+}
+
+/* Delete button styles */
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 3;
+}
+
+.folder-item:hover .delete-button {
+    opacity: 1;
+}
+
+/* Folder Header Styling */
+.folder-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+.folder-header-icon {
+    font-size: 18px;
+    color: #000;
+}
+
+.folder-header-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+}
+
+.new-folder-button {
+    width: 100%;
+    max-width: 320px;
+    background: black;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+/* Inspiration Grid */
+.inspiration-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.inspiration-card {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.inspiration-card:hover {
+    transform: scale(1.03);
+}
+
+.inspiration-card:hover .delete-button {
+    opacity: 1;
+}
+
+.inspiration-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+/* Modal */
+.modal-image-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.modal-image {
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Empty state message */
+.empty-message {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+/* Inspiration Selection */
+.select-inspiration-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+    white-space: nowrap;
+    scrollbar-width: thin;
+}
+
+.select-inspiration-item {
+    position: relative;
+    flex: 0 0 auto;
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.select-inspiration-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Selected state */
+.select-inspiration-item.selected {
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.5);
+    transform: scale(1.1);
 }

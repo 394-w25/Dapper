@@ -5,9 +5,7 @@ import BackButton from "../../components/inspiration/BackButton";
 import { Container, Button, Form } from "react-bootstrap";
 import { FaArrowLeft, FaCamera, FaRedo } from "react-icons/fa";
 import Webcam from "react-webcam";
-import { database, useAuthState, uploadInspiration, useDbUpdate } from "../../utilities/firebase";
-import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { set, push } from "firebase/database";
+import { useAuthState, uploadInspiration, useDbUpdate } from "../../utilities/firebase";
 import "./UploadDetailsPage.css";
 
 const UploadDetailsPage = () => {

@@ -1,8 +1,53 @@
-.chat {
-    text-align: center;
+.chat-list-container {
     padding: 20px;
-}
-
-.chat-content {
-    padding-top: 80px;
-}
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .chat-list-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  .chat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .chat-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .chat-card:hover {
+    background: #e9ecef;
+  }
+  
+  .chat-info {
+    flex-grow: 1;
+  }
+  
+  .chat-friend-name {
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .chat-latest-message {
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .chat-outfit-count {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+  }
+  

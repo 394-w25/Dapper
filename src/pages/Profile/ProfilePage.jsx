@@ -148,7 +148,7 @@ const ProfilePage = () => {
         </Card>
 
         <Card className="section-cards">
-          <Card.Header className="section-card-header" onClick={() => navigate('/inspiration')} style={{ cursor: "pointer" }}>Inspiration
+          <Card.Header className="section-card-header" onClick={() => navigate('/mycloset', { state: { selectedTopFilter: 'Inspiration' } })} style={{ cursor: "pointer" }}>Inspiration
             <MdKeyboardArrowRight className="arrow-icon" />
           </Card.Header>
           <Card.Body>

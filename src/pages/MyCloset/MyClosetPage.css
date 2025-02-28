@@ -17,15 +17,36 @@
     justify-content: flex-start;
     scroll-behavior: smooth;
 }
-.top-level-filter-container {
+
+/* Top-Level Filter (Consistent with Folder/View Buttons in InspirationPage) */
+.closet-actions {
     margin-top: 60px;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px 0;
-    justify-content: flex-start;
-    scroll-behavior: smooth;
+    max-width: 320px;
+    gap: 10px;
+    margin-bottom: 15px;
 }
+
+.closet-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    width: 48%;
+    justify-content: center;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.closet-button.active {
+    background: black !important;
+    color: white !important;
+    border: none;
+}
+
 
 .category-filter {
     display: inline-flex;
@@ -147,12 +168,11 @@
 .modal-image-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 15px;
     position: relative;
 }
 
 .modal-image {
-    max-height: 250px;
+    height: 250px;
     object-fit: cover;
     border-radius: 10px;
 }

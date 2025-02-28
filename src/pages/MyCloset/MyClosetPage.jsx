@@ -87,27 +87,27 @@ const MyClosetPage = () => {
   };
 
   const fetchUserOutfits = async () => {
-  if (!user) return;
+    if (!user) return;
 
-  try {
-    const outfitsRef = ref(database, 'outfits');
-    const snapshot = await get(outfitsRef);
+    try {
+      const outfitsRef = ref(database, 'outfits');
+      const snapshot = await get(outfitsRef);
 
-    if (snapshot.exists()) {
-      const outfitsData = snapshot.val();
-      const userOutfits = Object.values(outfitsData)
-        .filter(outfit => outfit.createdBy === user.uid)
-        .map(outfit => ({
-          id: outfit.outfitId,
-          ...outfit
-        }));
+      if (snapshot.exists()) {
+        const outfitsData = snapshot.val();
+        const userOutfits = Object.values(outfitsData)
+          .filter(outfit => outfit.createdBy === user.uid)
+          .map(outfit => ({
+            id: outfit.outfitId,
+            ...outfit
+          }));
 
-      setUserOutfits(userOutfits);
+        setUserOutfits(userOutfits);
+      }
+    } catch (error) {
+      console.error("Error fetching user outfits:", error);
     }
-  } catch (error) {
-    console.error("Error fetching user outfits:", error);
-  }
-};
+  };
 
   // When user clicks an item in the grid (outfit or clothing)
   const handleShowModal = (item) => {
@@ -118,8 +118,8 @@ const MyClosetPage = () => {
   // When user clicks delete button (on grid card or inside modal)
   const handleDeleteClick = (item) => {
     setItemToDelete(item);
+    setShowModal(false);  // Close the detail modal if open
     setShowDeleteModal(true);
-    setShowModal(false); // Close the detail modal if open
   };
 
   // Actually delete the item (if it’s clothing). You may also add logic for outfits here if needed.
@@ -182,7 +182,7 @@ const MyClosetPage = () => {
   // 1) If top-level is "Outfits", ignore the category filter, just show outfits
   // 2) If top-level is "Clothing", show only clothing + category filter
   // 3) If top-level is "All", show both clothing + outfits, but apply category filter to clothing only.
-  
+
   let itemsToDisplay = [];
 
   if (selectedTopFilter === "Outfits") {
@@ -207,24 +207,23 @@ const MyClosetPage = () => {
   return (
     <div className="mycloset">
       <Header title="My Closet" />
-      
+
       {/* Top-level filter: All, Clothing, Outfits */}
-      <Container fluid className="top-level-filter-container">
-        <ButtonGroup className="mb-3">
-          {topLevelFilters.map((filter) => (
-            <Button
-              key={filter.name}
-              variant={selectedTopFilter === filter.name ? "secondary" : "outline-secondary"}
-              onClick={() => {
-                setSelectedTopFilter(filter.name);
-                setSelectedCategory("All"); // reset category to All whenever top-level changes
-              }}
-            >
-              {filter.name}
-            </Button>
-          ))}
-        </ButtonGroup>
-      </Container>
+      <div className="closet-actions">
+        {topLevelFilters.map((filter) => (
+          <Button
+            key={filter.name}
+            variant={selectedTopFilter === filter.name ? "dark" : "outline-dark"}
+            className={`closet-button ${selectedTopFilter === filter.name ? "active" : ""}`}
+            onClick={() => {
+              setSelectedTopFilter(filter.name);
+              setSelectedCategory("All"); // reset category when top-level filter changes
+            }}
+          >
+            {filter.name}
+          </Button>
+        ))}
+      </div>
 
       {/* Category filter: only visible as normal if top-level is Clothing or All; 
           if top-level is Outfits, show only "All" button. */}
@@ -262,31 +261,40 @@ const MyClosetPage = () => {
 
       {/* Grid */}
       <Container className="mycloset-content">
-            <Row className="clothing-grid">
-        {itemsToDisplay.length > 0 ? (
-          itemsToDisplay.map((item, index) => (
-            <Col key={index} xs={6} className="mb-3">
-              <Card className="clothing-item">
-                <div className="clothing-image-wrapper" onClick={() => handleShowModal(item)}>
-                  <Card.Img variant="top" src={item.imageUrl} alt={item.name} />
-                </div>
+        <Row className="clothing-grid">
+          {itemsToDisplay.length > 0 ? (
+            itemsToDisplay.map((item, index) => (
+              <Col key={index} xs={6} className="mb-3">
+                <Card className="clothing-item">
+                  <div className="clothing-image-wrapper" onClick={() => handleShowModal(item)}>
+                    <Card.Img variant="top" src={item.imageUrl} alt={item.name} />
+                    <button
+                      className="delete-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(item);
+                    }}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
 
-                {/* Show "Get Feedback" button only for outfits */}
-                {item.isOutfit && (
-                  <button 
-                    className="feedback-button" 
-                    onClick={() => handleOpenFeedbackModal(item.id)}
-                  >
-                    Get Feedback
-                  </button>
-                )}
-              </Card>
-            </Col>
-          ))
-        ) : (
-          <p className="no-items">No items to show</p>
-        )}
-      </Row>
+                  {/* Show "Get Feedback" button only for outfits */}
+                  {item.isOutfit && (
+                    <button
+                      className="feedback-button"
+                      onClick={() => handleOpenFeedbackModal(item.id)}
+                    >
+                      Get Feedback
+                    </button>
+                  )}
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <p className="no-items">No items to show</p>
+          )}
+        </Row>
 
       </Container>
 
@@ -367,15 +375,15 @@ const MyClosetPage = () => {
       </CustomModal>
 
       {/* Feedback Request Modal */}
-    {showFeedbackModal && (
-      <FeedbackRequestModal 
-        outfitId={selectedOutfitId} 
-        onClose={() => setShowFeedbackModal(false)} 
-      />
-    )}
+      {showFeedbackModal && (
+        <FeedbackRequestModal
+          outfitId={selectedOutfitId}
+          onClose={() => setShowFeedbackModal(false)}
+        />
+      )}
 
     </div>
-    
+
   );
 };
 

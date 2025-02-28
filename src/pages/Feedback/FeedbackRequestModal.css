@@ -1,135 +1,311 @@
 .feedback-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-  }
-  
-  .feedback-modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 6px;
-    width: 80%;
-    max-width: 320px;
-    text-align: center;
-  }
-  
-  .tabs {
-    display: flex;
-    justify-content: space-evenly;
-    margin-bottom: 1rem;
-  }
-  
-  .tabs button {
-    flex: 1;
-    margin: 0 5px;
-    background: #ddd;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-  }
-  
-  .tabs button.active {
-    background: #4285f4;
-    color: #fff;
-  }
-  
- /* Friends List in Feedback Modal */
-/* Limit modal height and make list scrollable */
-.friends-list {
-  max-height: 300px; /* Prevents modal from growing indefinitely */
-  overflow-y: auto;  /* Enables scrolling when list is too long */
-  border-radius: 8px;
-  padding: 10px;
-  background: #f9f9f9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  /* Removed blur effect */
 }
 
+.feedback-modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 320px; /* Adjusted to fit phone width */
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: modal-appear 0.3s ease-out;
+  /* Make sure it doesn't exceed the screen */
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px; /* Slightly smaller */
+  color: #333;
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  background: #f0eef1;
+  border-radius: 8px;
+  /* Just a tiny bit more horizontal padding */
+  padding: 4px 6px;
+}
+
+.tabs button {
+  flex: 1;
+  border: none;
+  /* Just 1-2px more horizontal padding */
+  padding: 8px 4px;
+  cursor: pointer;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: #555;
+  font-size: 13px;
+  /* Very small gap between icon and text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Keep your existing active style */
+.tabs button.active {
+  background: #ffffff;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Friends List */
+.friends-list {
+  max-height: 240px; /* Reduced height */
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 6px;
+  background: #f9f9f9;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Scrollbar styling */
+.friends-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.friends-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.friends-list::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 10px;
+}
+
+.friends-list::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
 
 /* Friend Item */
 .friend-item {
   display: flex;
   align-items: center;
   background: white;
-  padding: 12px;
+  padding: 10px 12px; /* Reduced padding */
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid #ddd;
+  border: 1px solid #eee;
   gap: 12px;
+  position: relative;
 }
 
 .friend-item:hover {
-  transform: scale(1.02);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-color: #ddd;
+}
+
+.friend-item input[type="radio"]:checked + .friend-item,
+.friend-item:has(input[type="radio"]:checked) {
   border-color: #4285f4;
+  background-color: #f0f7ff;
 }
 
 /* Friend Avatar */
 .friend-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px; /* Smaller */
+  height: 36px; /* Smaller */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 16px; /* Smaller */
   font-weight: bold;
-  background: #ddd;
-  color: #555;
+  background: linear-gradient(45deg, #e1e1e1, #f5f5f5);
+  color: #444;
   overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .friend-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+}
+
+.friend-avatar span {
+  text-transform: uppercase;
 }
 
 /* Friend Name */
 .friend-name {
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 14px; /* Smaller */
+  font-weight: 500;
   color: #333;
+  text-align: left;
+  flex-grow: 1;
 }
 
-/* Selected Radio Button */
+/* Radio Button */
 .friend-item input[type="radio"] {
   margin-left: auto;
   accent-color: #4285f4;
-  transform: scale(1.2);
+  width: 16px; /* Smaller */
+  height: 16px; /* Smaller */
+  cursor: pointer;
 }
 
-  
-  
-  .send-btn {
-    background: #4285f4;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .close-btn {
-    background: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .invite-link {
-    word-break: break-all;
-    font-size: 14px;
-  }
-  
+/* Message for no friends */
+.friends-list + p {
+  color: #666;
+  font-size: 14px;
+  margin: 18px 0;
+}
+
+/* Buttons */
+.send-btn {
+  background: #4285f4;
+  color: #fff;
+  border: none;
+  padding: 10px; /* Reduced padding */
+  width: 100%;
+  cursor: pointer;
+  margin-top: 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 15px; /* Smaller */
+  transition: background 0.2s ease;
+}
+
+.send-btn:hover {
+  background: #3367d6;
+}
+
+.close-btn {
+  background: #f0eef1;
+  color: #555;
+  border: none;
+  padding: 10px; /* Reduced padding */
+  width: 100%;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 15px; /* Smaller */
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e4e2e7;
+  color: #333;
+}
+
+/* Invite Link */
+.invite-link {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  word-break: break-all;
+  font-size: 13px; /* Smaller */
+  margin: 14px 0;
+  border: 1px dashed #ddd;
+  text-align: left;
+}
+
+.invite-link a {
+  color: #4285f4;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Success message */
+.success-message {
+  background-color: #e7f3e8;
+  color: #2e7d32;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 14px 0;
+  font-weight: 500;
+  font-size: 14px;
+  animation: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Add Friend Tab */
+.user-search-container {
+  margin-bottom: 14px;
+}
+
+.user-search-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.search-results {
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.user-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s ease;
+}
+
+.user-result-item:hover {
+  background: #f0f7ff;
+}
+
+.add-friend-btn {
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  margin-left: auto;
+  cursor: pointer;
+  font-size: 13px;
+}

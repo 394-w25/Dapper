@@ -14,7 +14,7 @@ const HomePage = ({ user }) => {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [actions, setActions] = useState([
     { id: 1, name: "My Closet", link: "mycloset", icon: <FaTshirt />, visible: true },
-    { id: 2, name: "Outfit History", link: "myoutfits", icon: <BsClockHistory />, visible: true }, // aidan change the link here once the outfits page is done
+    { id: 2, name: "Outfit History", action: () => navigate('/mycloset', { state: { selectedTopFilter: 'Outfits' } }), icon: <BsClockHistory />, visible: true }, // aidan change the link here once the outfits page is done
     { id: 3, name: "Chat History", link: "chat", icon: <BsChatDots />, visible: true },
     { id: 4, name: "My Inspiration", link: "inspiration", icon: <BsLightbulb />, visible: true },
     { id: 5, name: "My Friends", link: "chat", icon: <FaUserFriends />, visible: true },
@@ -54,8 +54,8 @@ const HomePage = ({ user }) => {
           .map((action) => (
             <div
               key={action.id}
-              className="action-card"
-              onClick={() => navigate(`/${action.link}`)} 
+              className="action-card" 
+              onClick={() => action.action ? action.action() : navigate(`/${action.link}`)}
             >
               <div className="action-title">
                 <div className="action-icon">{action.icon}</div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/header/Header";
 import { Form, Button, Container, Card, ListGroup } from "react-bootstrap";
 import CustomModal from "../../components/modal/CustomModal"; // Using custom modal because of smartphone wrapper
@@ -73,6 +73,24 @@ const AddItem = () => {
   const [imageFile, setImageFile] = useState(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showSubcategoryModal, setShowSubcategoryModal] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState(""); // ✅ Declared before useEffect
+  const [isProcessing, setIsProcessing] = useState(false); // ✅ Prevent duplicate processing
+
+
+
+// 🔥 Automatically process the image when URL input changes
+useEffect(() => {
+  if (!imageUrlInput.trim()) return; // Don't process empty input
+
+  // ✅ Wait 2 seconds before processing
+  const timeoutId = setTimeout(() => {
+    if (!isProcessing) {
+      handleUrlUpload(); // Auto-trigger image processing
+    }
+  }, 2000);
+
+  return () => clearTimeout(timeoutId); // Cleanup timeout if user types quickly
+}, [imageUrlInput]);
 
 
   // Handle input changes
@@ -80,32 +98,35 @@ const AddItem = () => {
     setItem({ ...item, [e.target.name]: e.target.value });
   };
 
-  const [imageUrlInput, setImageUrlInput] = useState(""); // ✅ Fix for undefined variable
 
-  const handleUrlUpload = async () => {
+   // 🔥 Handle URL Image Upload with RemoveBG API
+   const handleUrlUpload = async () => {
     if (!imageUrlInput.trim()) return; // Prevent empty input
-  
+    if (isProcessing) return; // Prevent multiple uploads at once
+    setIsProcessing(true); // ✅ Prevent duplicate processing
+
     try {
       console.log("🔄 Fetching image from URL:", imageUrlInput);
       const response = await fetch(imageUrlInput);
-  
+
       if (!response.ok) throw new Error("Invalid Image URL");
-  
+
       const blob = await response.blob();
       const file = new File([blob], `uploaded-${Date.now()}.jpg`, { type: blob.type });
-  
+
       // 🔥 Step 1: Send Image to RemoveBG API
       console.log("🚀 Sending image to RemoveBG API...");
       const apiKey = await getApiKey();
       if (!apiKey) {
         alert("API Key missing. Please check Firebase Database.");
+        setIsProcessing(false);
         return;
       }
-  
+
       const formData = new FormData();
       formData.append("image_file", file);
       formData.append("size", "auto");
-  
+
       const removeBgResponse = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
         headers: {
           "X-Api-Key": apiKey,
@@ -113,28 +134,29 @@ const AddItem = () => {
         },
         responseType: "blob",
       });
-  
+
       console.log("✅ Background removed successfully!");
-  
+
       // 🔥 Step 2: Upload the Cleaned Image to Firebase Storage
       const uniqueFilename = `removed-bg-${Date.now()}.png`;
       const removedBgFile = new File([removeBgResponse.data], uniqueFilename, { type: "image/png" });
-  
+
       const imageRef = storageRef(storage, `clothing/${removedBgFile.name}`);
       await uploadBytes(imageRef, removedBgFile);
       const downloadUrl = await getDownloadURL(imageRef);
-  
+
       console.log("✅ Image uploaded to Firebase:", downloadUrl);
-      
+
       // 🔥 Step 3: Update State with New Image URL
       setItem({ ...item, imageUrl: downloadUrl });
       setImageUrlInput(""); // ✅ Clear input field after successful upload
     } catch (error) {
       console.error("❌ Error processing image from URL:", error);
       alert("Failed to upload and process image from URL. Please check the link.");
+    } finally {
+      setIsProcessing(false); // ✅ Reset processing state after completion
     }
   };
-  
 
   const getApiKey = async () => {
     const apiKeyRef = ref(db, "config/remove_bg_api_key");
@@ -312,23 +334,16 @@ const AddItem = () => {
 
           {/* ✅ Hide "Upload from URL" when an image is uploaded */}
           {!item.imageUrl && (
-            <Form.Group className="mb-3">
-              <Form.Label>Upload from URL</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Paste image link (Instagram, Twitter, etc.)"
-                value={imageUrlInput}
-                onChange={(e) => setImageUrlInput(e.target.value)}
-              />
-              <Button
-                variant="secondary"
-                className="mt-2 w-100"
-                onClick={handleUrlUpload}
-                disabled={!imageUrlInput.trim()}
-              >
-                Upload from Link
-              </Button>
-            </Form.Group>
+           <Form.Group className="mb-3">
+           <Form.Label>Upload from URL</Form.Label>
+           <Form.Control
+             type="text"
+             placeholder="Paste image link (Instagram, Twitter, etc.)"
+             value={imageUrlInput}
+             onChange={(e) => setImageUrlInput(e.target.value)}
+           />
+         </Form.Group>
+         
           )}
 
 

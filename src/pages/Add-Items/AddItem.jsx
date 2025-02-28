@@ -84,25 +84,57 @@ const AddItem = () => {
 
   const handleUrlUpload = async () => {
     if (!imageUrlInput.trim()) return; // Prevent empty input
-
+  
     try {
+      console.log("🔄 Fetching image from URL:", imageUrlInput);
       const response = await fetch(imageUrlInput);
+  
       if (!response.ok) throw new Error("Invalid Image URL");
-
+  
       const blob = await response.blob();
-      const file = new File([blob], "uploaded-image.jpg", { type: blob.type });
-
-      const imageRef = storageRef(storage, `clothing/${file.name}`);
-      await uploadBytes(imageRef, file);
+      const file = new File([blob], `uploaded-${Date.now()}.jpg`, { type: blob.type });
+  
+      // 🔥 Step 1: Send Image to RemoveBG API
+      console.log("🚀 Sending image to RemoveBG API...");
+      const apiKey = await getApiKey();
+      if (!apiKey) {
+        alert("API Key missing. Please check Firebase Database.");
+        return;
+      }
+  
+      const formData = new FormData();
+      formData.append("image_file", file);
+      formData.append("size", "auto");
+  
+      const removeBgResponse = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
+        headers: {
+          "X-Api-Key": apiKey,
+          "Content-Type": "multipart/form-data",
+        },
+        responseType: "blob",
+      });
+  
+      console.log("✅ Background removed successfully!");
+  
+      // 🔥 Step 2: Upload the Cleaned Image to Firebase Storage
+      const uniqueFilename = `removed-bg-${Date.now()}.png`;
+      const removedBgFile = new File([removeBgResponse.data], uniqueFilename, { type: "image/png" });
+  
+      const imageRef = storageRef(storage, `clothing/${removedBgFile.name}`);
+      await uploadBytes(imageRef, removedBgFile);
       const downloadUrl = await getDownloadURL(imageRef);
-
+  
+      console.log("✅ Image uploaded to Firebase:", downloadUrl);
+      
+      // 🔥 Step 3: Update State with New Image URL
       setItem({ ...item, imageUrl: downloadUrl });
       setImageUrlInput(""); // ✅ Clear input field after successful upload
     } catch (error) {
-      console.error("Error uploading image from URL:", error);
-      alert("Failed to upload image from URL. Please check the link.");
+      console.error("❌ Error processing image from URL:", error);
+      alert("Failed to upload and process image from URL. Please check the link.");
     }
   };
+  
 
   const getApiKey = async () => {
     const apiKeyRef = ref(db, "config/remove_bg_api_key");

@@ -69,7 +69,7 @@ const MyClosetPage = () => {
   useEffect(() => {
     fetchClothingDetails();
     fetchUserOutfits();
-  }, [userData]);
+  }, [userData, user]);
 
   const fetchClothingDetails = async () => {
     if (!userData || !userData.closet) return;
@@ -87,22 +87,27 @@ const MyClosetPage = () => {
   };
 
   const fetchUserOutfits = async () => {
-    // If user doesn't have an outfits array, we skip
-    if (!userData || !userData.outfits) return;
+  if (!user) return;
 
-    const fetchedOutfits = [];
-    const outfitsObj = userData.outfits;
-    const outfitIds = Object.keys(outfitsObj);
-    for (const outfitId of outfitIds) {
-      const outfitRef = ref(database, `outfits/${outfitId}`);
-      const snapshot = await get(outfitRef);
+  try {
+    const outfitsRef = ref(database, 'outfits');
+    const snapshot = await get(outfitsRef);
 
-      if (snapshot.exists()) {
-        fetchedOutfits.push({ id: outfitId, ...snapshot.val() });
-      }
+    if (snapshot.exists()) {
+      const outfitsData = snapshot.val();
+      const userOutfits = Object.values(outfitsData)
+        .filter(outfit => outfit.createdBy === user.uid)
+        .map(outfit => ({
+          id: outfit.outfitId,
+          ...outfit
+        }));
+
+      setUserOutfits(userOutfits);
     }
-    setUserOutfits(fetchedOutfits);
-  };
+  } catch (error) {
+    console.error("Error fetching user outfits:", error);
+  }
+};
 
   // When user clicks an item in the grid (outfit or clothing)
   const handleShowModal = (item) => {

@@ -1,53 +1,69 @@
 .chat-list-container {
-    padding: 20px;
-    background-color: #f8f9fa;
-    min-height: 100vh;
-  }
-  
-  .chat-list-title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  
-  .chat-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .chat-card {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    border-radius: 10px;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .chat-card:hover {
-    background: #e9ecef;
-  }
-  
-  .chat-info {
-    flex-grow: 1;
-  }
-  
-  .chat-friend-name {
-    font-weight: bold;
-    font-size: 16px;
-  }
-  
-  .chat-latest-message {
-    font-size: 14px;
-    color: #555;
-  }
-  
-  .chat-outfit-count {
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px;
-  }
-  
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.chat-list-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #222;
+  padding-left: 5px;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.chat-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #e1e4e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #555;
+  margin-right: 15px;
+  font-size: 18px;
+}
+
+.chat-info {
+  flex-grow: 1;
+}
+
+.chat-friend-name {
+  font-weight: 600;
+  font-size: 17px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.chat-latest-message {
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}

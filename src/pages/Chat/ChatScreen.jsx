@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getDatabase, ref, onValue, push, set, get } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
 import { useParams, useNavigate } from "react-router-dom";
 import SuggestionModal from "../Feedback/SuggestionModal";
 import OutfitPreviewModal from "./OutfitPreviewModal";
+import { Send } from "lucide-react"; // Import Send icon
 import "./ChatScreen.css";
 
 const ChatScreen = () => {
@@ -14,17 +15,24 @@ const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState("");
   const [outfits, setOutfits] = useState([]);
   const [outfitId, setOutfitId] = useState(null);
+  const [friendName, setFriendName] = useState("");
 
   const [isOwner, setIsOwner] = useState(false);
   const [showOutfitModal, setShowOutfitModal] = useState(false);
-  
-  // ✅ Define showSuggestionModal state to fix the error
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [suggestionId, setSuggestionId] = useState(null);
 
+  const messagesEndRef = useRef(null);
   const db = getDatabase();
 
+  // Scroll to bottom when messages change
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     if (!user || !chatId) return;
@@ -33,7 +41,23 @@ const ChatScreen = () => {
     onValue(chatRef, async (snapshot) => {
       if (snapshot.exists()) {
         const chatData = snapshot.val();
-        setMessages(Object.values(chatData.messages || {}));
+        
+        // Get messages and sort by timestamp
+        const messagesData = chatData.messages ? Object.values(chatData.messages) : [];
+        messagesData.sort((a, b) => a.timestamp - b.timestamp);
+        setMessages(messagesData);
+  
+        // Get friend's name
+        if (chatData.users) {
+          const friendId = Object.keys(chatData.users).find(id => id !== user.uid);
+          if (friendId) {
+            const userRef = ref(db, `users/${friendId}`);
+            const userSnapshot = await get(userRef);
+            if (userSnapshot.exists()) {
+              setFriendName(userSnapshot.val().displayName || "Chat");
+            }
+          }
+        }
   
         if (chatData.outfitIds) {
           const outfitPromises = chatData.outfitIds.map(async (outfitId) => {
@@ -46,7 +70,6 @@ const ChatScreen = () => {
           const validOutfits = outfitsData.filter(Boolean);
           setOutfits(validOutfits);
   
-          // ✅ Set outfitId when outfits are fetched
           if (validOutfits.length > 0) {
             setOutfitId(validOutfits[0].id);
           }
@@ -57,7 +80,6 @@ const ChatScreen = () => {
     });
   }, [user, chatId, db]);
   
-
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
     const newMessageRef = push(ref(db, `chats/${chatId}/messages`));
@@ -71,10 +93,24 @@ const ChatScreen = () => {
     setNewMessage("");
   };
 
+  // Format timestamp to readable time
+  const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
   return (
     <div className="chat-container">
-      <h2>Chat</h2>
+      <div className="chat-header">
+        <h2>{friendName || "Chat"}</h2>
+      </div>
 
       <button className="preview-outfits-btn" onClick={() => setShowOutfitModal(true)}>
         Preview Outfits in this Chat
@@ -83,7 +119,7 @@ const ChatScreen = () => {
       <div className="chat-messages">
         {messages.map((msg, index) => {
           const isSystemMessage = msg.senderId === "system";
-
+          
           return (
             <div
               key={index}
@@ -92,8 +128,11 @@ const ChatScreen = () => {
               }`}
             >
               <p>{msg.text}</p>
+              
+              {!isSystemMessage && (
+                <div className="message-time">{formatTime(msg.timestamp)}</div>
+              )}
 
-              {/* ✅ Show "Review Suggested Changes" button only if the user is the outfit owner */}
               {isSystemMessage && msg.text.includes("suggested changes") && isOwner && (
                 <button
                   onClick={() => {
@@ -107,41 +146,43 @@ const ChatScreen = () => {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <button onClick={sendMessage}>Send</button>
+      <div className="chat-input-container">
+        <div className="chat-input">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button onClick={sendMessage}>
+            <Send className="send-icon" size={20} />
+          </button>
+        </div>
       </div>
 
-      {/* ✅ Include Outfit Preview Modal */}
       {showOutfitModal && (
         <OutfitPreviewModal
-        show={showOutfitModal}
-        onClose={() => setShowOutfitModal(false)}
-        outfits={outfits}
-        navigate={navigate}
-        user={user} // ✅ Pass user to hide "Suggest Changes" button for the owner
-      />
-      
+          show={showOutfitModal}
+          onClose={() => setShowOutfitModal(false)}
+          outfits={outfits}
+          navigate={navigate}
+          user={user}
+        />
       )}
 
-      {/* ✅ Include Suggestion Modal */}
       {showSuggestionModal && (
         <SuggestionModal 
-        show={showSuggestionModal}
-        onHide={() => setShowSuggestionModal(false)}
-        suggestionId={suggestionId}
-        outfitId={outfitId}  
-        chatId={chatId}      
-        user={user}          
-      />
-      
+          show={showSuggestionModal}
+          onHide={() => setShowSuggestionModal(false)}
+          suggestionId={suggestionId}
+          outfitId={outfitId}  
+          chatId={chatId}      
+          user={user}          
+        />
       )}
     </div>
   );

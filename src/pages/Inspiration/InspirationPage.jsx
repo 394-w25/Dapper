@@ -17,6 +17,7 @@ const InspirationPage = () => {
     const [viewMode, setViewMode] = useState("folders"); // 'folders' | 'all' | 'folder'
     const [selectedFolder, setSelectedFolder] = useState(null);
     const [selectedInspiration, setSelectedInspiration] = useState(null);
+    const [savedInspirationIds, setSavedInspirationIds] = useState([]);
     const [showModal, setShowModal] = useState(false);
 
     const [showNewFolderModal, setShowNewFolderModal] = useState(false);
@@ -47,6 +48,10 @@ const InspirationPage = () => {
                     id,
                     ...data
                 })));
+            }
+            // Set saved inspirations
+            if (inspirationData.pexels) {
+                setSavedInspirationIds(inspirationData.pexels);
             }
         }
     }, [inspirationData]);
@@ -193,6 +198,17 @@ const InspirationPage = () => {
                     updates[`folders/${folder.id}/inspirationIds`] = folder.inspirationIds;
                 });
                 await updateData(updates);
+
+                // Remove the Pexels ID if it's in the list
+                if (savedInspirationIds.includes(inspirationToDelete.id)) {
+                    const updatedPexels = savedInspirationIds.filter(id => id !== inspirationToDelete.id);
+                    
+                    await updateData({
+                        [`pexels`]: updatedPexels
+                    });
+
+                    setSavedInspirationIds(updatedPexels);
+                }
 
                 // Remove from state
                 setInspirations((prev) => prev.filter(insp => insp.id !== inspirationToDelete.id));

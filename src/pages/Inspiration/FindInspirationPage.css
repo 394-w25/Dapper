@@ -1,15 +1,11 @@
 .find-inspiration {
     background: #fff;
     min-height: 100%;
-    font-family: Arial, sans-serif;
-}
-
-.find-container {
-    padding-top: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-bottom: 90px;
+    padding-top: 70px;
 }
 
 /* Search Bar */
@@ -17,7 +13,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
     background: #f8f9fa;
     padding: 8px;
     border-radius: 10px;
@@ -36,38 +32,54 @@
     padding-left: 30px;
 }
 
-/* Category Buttons */
-.category-buttons {
+.category-filter-container {
+    margin-top: -5px;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
+    justify-content: flex-start;
+    scroll-behavior: smooth;
+}
+
+.category-filter {
+    display: inline-flex;
+    gap: 0px;
+    padding: 0 10px;
+}
+
+.category-filter-container::-webkit-scrollbar {
+    display: none;
+}
+
+.category-filter-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .category-button {
-    padding: 8px 14px;
-    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     font-size: 14px;
-    font-weight: 500;
-    background: #f0f0f0;
-    border: none;
-    color: #333;
-    transition: 0.3s;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .category-button.active {
-    background: black;
-    color: white;
+    background: black !important;
+    color: white !important;
+    border: none;
 }
 
-/* Inspirations Grid */
 .inspiration-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 10px;
     width: 100%;
-    max-width: 320px;
+    max-width: 360px;
     margin-bottom: 20px;
 }
 
@@ -75,44 +87,54 @@
     background: white;
     border-radius: 10px;
     overflow: hidden;
-    text-align: left;
+    text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    position: relative;
 }
 
-.inspiration-placeholder {
-    background: #dcdcdc;
-    height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
+.inspiration-card:hover {
+    transform: scale(1.05);
+}
+
+.inspiration-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 .inspiration-details {
     padding: 8px;
 }
 
-.inspiration-details h5 {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 5px 0;
-}
-
 .inspiration-details p {
     font-size: 12px;
     color: #777;
+    margin-bottom: 5px;
 }
 
-/* Save Button */
-.save-button {
-    width: 100%;
-    max-width: 300px;
-    background: black;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 8px;
+.modal-image-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.modal-image {
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.custom-modal-body p {
+    margin-bottom: 0px;
+}
+
+.saved-indicator {
+    color: green;
+    font-size: 18px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
 }

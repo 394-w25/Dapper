@@ -4,9 +4,22 @@ import { getDatabase, ref, get, set, push } from 'firebase/database';
 import { useAuthState } from '../../utilities/firebase';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import DomToImage from 'dom-to-image';
-import { Button, Card, Container, Row, Col } from 'react-bootstrap';
+import { Button, Card, Container, Row, Col, ButtonGroup, Nav } from 'react-bootstrap';
 import { FiMinusCircle } from 'react-icons/fi';
-// import './OutfitFeedbackPage.css';
+import { FaTshirt } from 'react-icons/fa';
+import { FaBagShopping } from 'react-icons/fa6';
+import { TbHanger } from 'react-icons/tb';
+import { PiPantsFill } from 'react-icons/pi';
+import { GiRunningShoe } from 'react-icons/gi';
+import Header from '../../components/header/Header';
+
+const categories = [
+  { name: 'All', icon: <TbHanger /> },
+  { name: 'Tops', icon: <FaTshirt /> },
+  { name: 'Bottoms', icon: <PiPantsFill /> },
+  { name: 'Shoes', icon: <GiRunningShoe /> },
+  { name: 'Accessories', icon: <FaBagShopping /> }
+];
 
 const OutfitFeedbackPage = () => {
   const { outfitId } = useParams();
@@ -19,6 +32,9 @@ const OutfitFeedbackPage = () => {
   const [originalOutfit, setOriginalOutfit] = useState(null);
   const [editedOutfit, setEditedOutfit] = useState([]);
   const [closetItems, setClosetItems] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [clickedItems, setClickedItems] = useState(new Set());
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   useEffect(() => {
     if (!user || !outfitId) return;
@@ -49,7 +65,7 @@ const OutfitFeedbackPage = () => {
           console.log("Fetched outfit clothing details:", clothingDetails);
           setEditedOutfit(clothingDetails);
   
-          // ✅ Call fetchCloset only AFTER fetching outfit
+          // Call fetchCloset only AFTER fetching outfit
           if (outfitData.createdBy) {
             fetchCloset(outfitData.createdBy);
           }
@@ -62,7 +78,7 @@ const OutfitFeedbackPage = () => {
     };
   
     const fetchCloset = async (ownerId) => {
-      if (!ownerId) return; // 🛑 Prevent errors if ownerId is undefined
+      if (!ownerId) return; // Prevent errors if ownerId is undefined
   
       console.log("Fetching closet for friend (outfit creator):", ownerId);
       const closetSnapshot = await get(ref(db, `users/${ownerId}/closet`));
@@ -90,18 +106,17 @@ const OutfitFeedbackPage = () => {
       }
     };
   
-    fetchOutfitAndCloset(); // ✅ Call fetchOutfit, which will then call fetchCloset
+    fetchOutfitAndCloset();
   
   }, [user, outfitId, db]);
   
-
-  // 🟢 Enable dragging items from the closet
+  // Enable dragging items from the closet
   const handleDragStart = (event, item) => {
     console.log("Dragging item:", item);
     event.dataTransfer.setData('clothingItem', JSON.stringify(item));
   };
 
-  // 🟢 Allow dropping items into the outfit
+  // Allow dropping items into the outfit
   const handleDrop = (event) => {
     event.preventDefault();
     const item = JSON.parse(event.dataTransfer.getData('clothingItem'));
@@ -112,7 +127,7 @@ const OutfitFeedbackPage = () => {
     }
   };
 
-  // 🔴 Allow removing items from the outfit
+  // Allow removing items from the outfit
   const removeItemFromOutfit = (itemToRemove) => {
     setEditedOutfit(editedOutfit.filter(item => item.id !== itemToRemove.id));
   };
@@ -148,7 +163,7 @@ const OutfitFeedbackPage = () => {
   
       console.log("Outfit suggestion saved successfully!");
   
-      // 🔍 FIND EXISTING CHAT BETWEEN USERS
+      // FIND EXISTING CHAT BETWEEN USERS
       const chatsSnapshot = await get(ref(db, `chats`));
       let chatId = null;
   
@@ -156,7 +171,7 @@ const OutfitFeedbackPage = () => {
         const chats = chatsSnapshot.val();
         for (const [id, chat] of Object.entries(chats)) {
           if (chat.users && chat.users[user.uid] && chat.users[originalOutfit.createdBy]) {
-            chatId = id;  // ✅ Found existing chat
+            chatId = id;  // Found existing chat
             break;
           }
         }
@@ -180,7 +195,7 @@ const OutfitFeedbackPage = () => {
       await set(newMessageRef, {
         senderId: 'system',
         text: `${user.displayName} has suggested changes to your outfit. Click to review!`,
-        suggestionId: suggestionId,  // ✅ Store suggestionId
+        suggestionId: suggestionId,
         timestamp: Date.now(),
       });
   
@@ -191,63 +206,121 @@ const OutfitFeedbackPage = () => {
       console.error("Error suggesting changes:", error);
     }
   };
-  
 
   return (
-    <Container className="outfit-feedback">
-      <h2>Suggest Changes</h2>
-      
-      {/* Outfit Preview */}
-      <div className="outfit-preview" ref={outfitRef} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-  <div className="outfit-palette">
-    {editedOutfit.length > 0 ? (
-      editedOutfit.map((item, index) => (
-        <div key={index} className="outfit-item" draggable>
-          <img
-            src={item.imageUrl}  // ✅ Show actual image
-            alt={item.name}
-            className="outfit-item-img"
-          />
-          <FiMinusCircle
-            className="delete-item"
-            onClick={() => removeItemFromOutfit(item)}
-          />
-        </div>
-      ))
-    ) : (
-      <p>Drag & drop items here...</p>
-    )}
-  </div>
-</div>
+    <div className="outfit-builder">
+      {/* Using the shared Header component */}
+      <Header title="Suggest Changes" />
 
+      <Container className="outfitbuilder-content">
+        {/* Outfit Preview Area */}
+        <Row className="mb-4">
+          <Col>
+            <div className="outfit-preview" ref={outfitRef} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+              <div className="outfit-palette">
+                {editedOutfit.length > 0 ? (
+                  editedOutfit.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="outfit-item" 
+                      draggable
+                      style={{ gridColumn: (index % 2) + 1, gridRow: Math.floor(index / 2) + 1 }}
+                      onClick={() => {
+                        // Toggle clicked state for the item
+                        setClickedItems(prevState => {
+                          const newState = new Set(prevState);
+                          if (newState.has(item.id)) {
+                            newState.delete(item.id);
+                          } else {
+                            newState.add(item.id);
+                          }
+                          return newState;
+                        });
+                      }}
+                      onMouseEnter={() => setHoveredItem(item.id)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      <img
+                        src={item.imageUrl}
+                        alt="Clothing item"
+                        className="outfit-item-img"
+                      />
+                      {(clickedItems.has(item.id) || hoveredItem === item.id) && (
+                        <FiMinusCircle
+                          className="delete-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeItemFromOutfit(item);
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p>Drag & drop items here...</p>
+                )}
+              </div>
+            </div>
+          </Col>
+        </Row>
 
-      {/* Closet Items */}
-      <Row className="closet-items">
-        {closetItems.length > 0 ? (
-          closetItems.map((item) => (
-            <Col key={item.id} xs={6} md={4} lg={3} className="closet-item-container">
-              <Card className="closet-item-card">
-                <Card.Img
-                  src={item.imageUrl}
-                  alt={item.name}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, item)}
-                  className="closet-item-img"
-                />
-                <Card.Body>
-                  <Card.Text className="text-center">{item.name}</Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
-        ) : (
-          <p>No closet items found.</p>
-        )}
-      </Row>
+        {/* Category Filter Buttons - Similar to OutfitBuilderPage */}
+        <Row>
+          <Col>
+            <ButtonGroup className="categories mb-3">
+              {categories.map((category) => (
+                <Nav.Item key={category.name}>
+                  <Button
+                    variant={category.name === selectedCategory ? "secondary" : "outline-secondary"}
+                    onClick={() => setSelectedCategory(category.name)}
+                    className="category-button">
+                    {category.icon} {category.name}
+                  </Button>
+                </Nav.Item>
+              ))}
+            </ButtonGroup>
 
-      {/* Suggest Changes Button */}
-      <Button className="mt-3" onClick={suggestChanges}>Suggest Changes</Button>
-    </Container>
+            {/* Closet Items Grid */}
+            <div className="card-group-wrapper">
+              <div className="clothing-card-group">
+                {(selectedCategory === 'All' 
+                  ? closetItems 
+                  : closetItems.filter(item => item.category === selectedCategory))
+                  .map((item, index) => (
+                    <Card 
+                      key={index} 
+                      className="clothing-option" 
+                      draggable 
+                      onDragStart={(e) => handleDragStart(e, item)}
+                    >
+                      <Card.Img variant="top" src={item.imageUrl} />
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          </Col>
+        </Row>
+
+        {/* Submit Button - Styled like OutfitBuilderPage */}
+        <Row>
+          <Col className="text-center mt-3 mb-4">
+            <Button 
+              onClick={suggestChanges} 
+              className="footer-button" 
+              style={{
+                background: '#000',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '6px'
+              }}
+            >
+              Suggest Changes
+            </Button>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 };
 

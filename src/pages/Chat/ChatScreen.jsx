@@ -23,6 +23,7 @@ const ChatScreen = () => {
   const [suggestionId, setSuggestionId] = useState(null);
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const db = getDatabase();
 
   // Scroll to bottom when messages change
@@ -33,6 +34,32 @@ const ChatScreen = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Store scroll position to maintain scroll when loading older messages
+  const [scrollPosition, setScrollPosition] = useState(0);
+  
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      setScrollPosition(messagesContainerRef.current.scrollTop);
+    }
+  };
+
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (messagesContainer) {
+      messagesContainer.addEventListener('scroll', handleScroll);
+      return () => {
+        messagesContainer.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, []);
+
+  // Restore scroll position after messages update
+  useEffect(() => {
+    if (messagesContainerRef.current && scrollPosition > 0) {
+      messagesContainerRef.current.scrollTop = scrollPosition;
+    }
+  }, [messages, scrollPosition]);
 
   useEffect(() => {
     if (!user || !chatId) return;
@@ -112,11 +139,13 @@ const ChatScreen = () => {
         <h2>{friendName || "Chat"}</h2>
       </div>
 
-      <button className="preview-outfits-btn" onClick={() => setShowOutfitModal(true)}>
-        Preview Outfits in this Chat
-      </button>
+      <div className="preview-outfits-btn-container">
+        <button className="preview-outfits-btn" onClick={() => setShowOutfitModal(true)}>
+          Preview Outfits in this Chat
+        </button>
+      </div>
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={messagesContainerRef}>
         {messages.map((msg, index) => {
           const isSystemMessage = msg.senderId === "system";
           

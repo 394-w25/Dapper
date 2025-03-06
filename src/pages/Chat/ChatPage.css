@@ -1,7 +1,16 @@
 .chat-list-container {
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: #faf8fc;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 70px; /* Add padding for the header */
 }
 
 .chat-list-title {
@@ -10,12 +19,6 @@
   margin-bottom: 20px;
   color: #222;
   padding-left: 5px;
-}
-
-.chat-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .chat-card {
@@ -65,5 +68,5 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 280px;
+  max-width: 180px;
 }

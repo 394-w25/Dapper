@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/header/Header"; // Import Header component
 import "./ChatPage.css"; 
 
 const ChatPage = () => {
@@ -74,7 +75,7 @@ const ChatPage = () => {
 
   return (
     <div className="chat-list-container">
-      <h2 className="chat-list-title">Chats</h2>
+      <Header title="Chats" />
       <div className="chat-list">
         {chats.length > 0 ? (
           chats.map((chat) => (

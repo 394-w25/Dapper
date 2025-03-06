@@ -46,11 +46,11 @@
     margin-right: 4px; 
 }
 
-/* 🔍 Search Results */
+/* 🔍 Search Results 50*/
 .search-results {
     list-style: none;
     padding: 0;
-    margin-top: 5px;
+    margin-top: 280px;
     background: white;
     border: 1px solid #ddd;
     border-radius: 10px;

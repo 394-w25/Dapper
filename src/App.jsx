@@ -8,6 +8,7 @@ import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import AddItem from './pages/Add-Items/AddItem';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
+import OutfitBuilderPageNew from './pages/OutfitBuilder/Outfitbuilderpagenew';
 import OutfitFeedbackPage from './pages/Feedback/OutfitFeedback';
 import SuggestionModal from './pages/Feedback/SuggestionModal';
 import ProfilePage from './pages/Profile/ProfilePage';
@@ -54,6 +55,7 @@ const App = () => {
               <Route path="/review-edits/:chatId" element={<SuggestionModal />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/outfit-builder" element={<OutfitBuilder />} />
+              <Route path="/outfit-builder-new" element={<OutfitBuilderPageNew />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

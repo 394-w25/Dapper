@@ -1,0 +1,107 @@
+.outfit-builder {
+    padding-top: 110px; /* same as the Header height */
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  
+  /* Reduce the margin below the 2x3 grid so category buttons are closer */
+  .outfit-preview {
+    margin-bottom: 40px; /* was 80px */
+  }
+  
+  /* Make the grid shorter */
+  .category-slot {
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    position: relative;
+    height: 100px; /* was 150px, reduce if you like */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .category-slot.filled {
+    background: #fff;
+    border: 2px solid #ccc;
+  }
+  .lock-icon.top-right {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 16px; /* adjust icon size */
+    color: #666;     /* optional */
+  }
+  
+  .outfit-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+  }
+  .remove-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #f00;
+  }
+  .category-label {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  
+  /* Category buttons row: remove mb-3 or reduce it */
+  .categories {
+    /* if you had mb-3, remove or reduce it */
+    margin-bottom: 0; /* or 0 */
+  }
+
+  .category-button {
+    font-size: 12px;      /* smaller text */
+    padding: 4px 6px;     /* less padding around text/icon */
+    line-height: 1;       /* tighter vertical spacing */
+    border-radius: 4px;   /* optional smaller corner radius */
+  }
+  
+  
+  /* Clothing carousel: remove extra margin if you have it */
+  .card-group-wrapper {
+    /* remove or reduce any top margin if you had it */
+    margin-top: 0; 
+    padding-top: 0;
+  }
+  .clothing-card-group {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+  }
+  .clothing-option {
+    min-width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 0;
+  }
+  
+  .footer-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 0; /* or 5px if you need a tiny gap from the bottom nav */
+    margin-top: 0;
+  }
+  .save-button,
+  .share-button,
+  .reset-button {
+    flex: 1;
+    font-size: 14px; /* slightly smaller text if you like */
+    padding: 6px;    /* smaller padding inside the button */
+  }
+  

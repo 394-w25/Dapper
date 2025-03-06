@@ -1,104 +1,117 @@
 /* ✅ Modal Overlay */
 .outfit-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  /* ✅ Smaller, Sleeker Modal */
-  .outfit-modal {
-    background: #f5f5f5;
-    padding: 18px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 360px;
-    position: relative;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  /* ✅ Close Button (X Icon) */
-  .outfit-modal-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #777;
-  }
-  
-  .outfit-modal-close:hover {
-    color: #444;
-  }
-  
-  /* ✅ Modal Title */
-  .outfit-modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  /* ✅ Outfit List */
-  .outfit-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  /* ✅ Outfit Item */
-  .outfit-item {
-    display: flex;
-    align-items: center;
-    background: #e0e0e0;
-    padding: 10px;
-    border-radius: 8px;
-    justify-content: space-between;
-    transition: background 0.2s;
-  }
-  
-  .outfit-item:hover {
-    background: #d6d6d6;
-  }
-  
-  /* ✅ Outfit Image */
-  .outfit-item img {
-    width: 45px;
-    height: 45px;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-  
-  /* ✅ Outfit Name */
-  .outfit-name {
-    flex: 1;
-    margin-left: 12px;
-    font-size: 14px;
-    color: #444;
-  }
-  
-  /* ✅ Sleek Grey "Suggest Changes" Button */
-  .outfit-suggest-btn {
-    background: #666;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 13px;
-    transition: background 0.2s;
-  }
-  
-  .outfit-suggest-btn:hover {
-    background: #555;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* ✅ Smaller Modal */
+.outfit-modal {
+  background: #f5f5f5;
+  padding: 18px;
+  border-radius: 12px;
+  width: 85%;
+  max-width: 320px;
+  position: relative;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* ✅ Close Button (X Icon) */
+.outfit-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #777;
+}
+
+.outfit-modal-close:hover {
+  color: #444;
+}
+
+/* ✅ Modal Title */
+.outfit-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* ✅ Outfit List */
+.outfit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ✅ Outfit Item - New Layout */
+.outfit-item {
+  display: flex;
+  padding: 16px;
+  border-radius: 8px;
+  background: #e9e9e9;
+  transition: background 0.2s;
+}
+
+.outfit-item:hover {
+  background: #d6d6d6;
+}
+
+/* ✅ Outfit Image - Larger */
+.outfit-item img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* ✅ Name and Button Container */
+.outfit-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 15px;
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* ✅ Outfit Name - Using !important to override any other styles */
+.outfit-name {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+  margin: 10px 0 10px 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+}
+
+/* ✅ Suggest Changes Button */
+.outfit-suggest-btn {
+  background: #666;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.2s;
+  align-self: center;
+  margin-top: 5px;
+}
+
+.outfit-suggest-btn:hover {
+  background: #555;
+}

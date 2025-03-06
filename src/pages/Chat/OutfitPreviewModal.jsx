@@ -19,14 +19,18 @@ const OutfitPreviewModal = ({ show, onClose, outfits, navigate, user }) => {
           {outfits.map((outfit, index) => (
             <div key={index} className="outfit-item">
               <img src={outfit.imageUrl || "default-image.png"} alt={outfit.name || "Outfit"} />
-              <p className="outfit-name">{outfit.name || "Unnamed Outfit"}</p>
+              
+              <div className="outfit-content">
+                {/* Using the h3 element with our strong CSS class */}
+                <h3 className="outfit-name">{outfit.name || "Unnamed Outfit"}</h3>
 
-              {/* ✅ Hide "Suggest Changes" if the user is the outfit owner */}
-              {outfit.createdBy !== user.uid && (
-                <button className="outfit-suggest-btn" onClick={() => navigate(`/outfit-feedback/${outfit.id}`)}>
-                  Suggest Changes
-                </button>
-              )}
+                {/* ✅ Hide "Suggest Changes" if the user is the outfit owner */}
+                {outfit.createdBy !== user.uid && (
+                  <button className="outfit-suggest-btn" onClick={() => navigate(`/outfit-feedback/${outfit.id}`)}>
+                    Suggest Changes
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

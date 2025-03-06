@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get, update, push, set } from "firebase/database";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage"; // ✅ Add this import!
-
-import { Modal, Button, ListGroup } from "react-bootstrap";
-import ImageComponent from "react-bootstrap/Image"; // ✅ Rename it
-
-
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Modal, Button } from "react-bootstrap";
+import ImageComponent from "react-bootstrap/Image";
 
 const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user }) => {
   const [suggestion, setSuggestion] = useState(null);
@@ -14,7 +11,7 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
   useEffect(() => {
     if (!suggestionId) return;
 
-    // ✅ Fetch the specific suggestion
+    // Fetch the specific suggestion
     const fetchSuggestion = async () => {
       const suggestionRef = ref(db, `outfits_suggestions/${suggestionId}`);
       const snapshot = await get(suggestionRef);
@@ -46,7 +43,7 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
         return;
       }
   
-      // 🔍 Step 1: Fetch clothing item image URLs from database
+      // Step 1: Fetch clothing item image URLs from database
       const clothingImageUrls = [];
       for (const clothingId of suggestion.clothingIDs) {
         const clothingRef = ref(db, `clothing/${clothingId}`);
@@ -65,25 +62,25 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
   
       console.log("📸 Retrieved clothing images:", clothingImageUrls);
   
-      // 🔍 Step 2: Create structured layout for outfit image
+      // Step 2: Create structured layout for outfit image
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
   
-      // ✅ Set canvas dimensions
+      // Set canvas dimensions
       const canvasWidth = 350;
       const canvasHeight = 250;
       canvas.width = canvasWidth;
       canvas.height = canvasHeight;
   
-      // ✅ Set size for each clothing item
+      // Set size for each clothing item
       const itemWidth = 80;
       const itemHeight = 80;
   
-      // ✅ Determine grid layout
+      // Determine grid layout
       const itemsPerRow = Math.ceil(Math.sqrt(clothingImageUrls.length));
       const totalRows = Math.ceil(clothingImageUrls.length / itemsPerRow);
   
-      // ✅ Calculate spacing for centering
+      // Calculate spacing for centering
       const totalWidth = itemsPerRow * itemWidth + (itemsPerRow - 1) * 20; // Include spacing
       const totalHeight = totalRows * itemHeight + (totalRows - 1) * 20;
   
@@ -102,19 +99,19 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
         ctx.drawImage(img, x, y, itemWidth, itemHeight);
       }
   
-      // 🔄 Convert canvas to Blob
+      // Convert canvas to Blob
       const dataUrl = canvas.toDataURL("image/png");
       const response = await fetch(dataUrl);
       const blob = await response.blob();
   
-      // ✅ Step 3: Upload new image to Firebase Storage
+      // Step 3: Upload new image to Firebase Storage
       const newImageRef = storageRef(storage, `outfits/${targetOutfitId}.png`);
       await uploadBytes(newImageRef, blob);
       const newImageUrl = await getDownloadURL(newImageRef);
   
       console.log("✅ New outfit image uploaded successfully:", newImageUrl);
   
-      // ✅ Step 4: Update the outfit in Firebase with new clothing IDs and image URL
+      // Step 4: Update the outfit in Firebase with new clothing IDs and image URL
       await update(ref(db, `outfits/${targetOutfitId}`), {
         clothingIDs: suggestion.clothingIDs,
         imageUrl: newImageUrl, 
@@ -122,7 +119,7 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
   
       console.log("✅ Outfit updated successfully!");
   
-      // ✅ Step 5: Send system message in chat
+      // Step 5: Send system message in chat
       const messageRef = push(ref(db, `chats/${chatId}/messages`));
       await set(messageRef, {
         senderId: "system",
@@ -132,15 +129,14 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
   
       console.log("✅ System message sent to chat!");
   
-      // ✅ Close modal after update
+      // Close modal after update
       onHide();
     } catch (error) {
       console.error("❌ Error updating outfit:", error);
     }
   };
   
-  
-  // ✅ Helper function to load images
+  // Helper function to load images
   const loadImage = (src) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -151,29 +147,31 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
     });
   };
 
-  
-  
-
   if (!suggestion) return null;
 
   return (
-    <Modal show={show} onHide={onHide} centered>
+    <Modal show={show} onHide={onHide} centered size="sm">
       <Modal.Header closeButton>
-        <Modal.Title>Suggested Outfit Changes</Modal.Title>
+        <Modal.Title>Suggested Changes</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-      <ImageComponent src={suggestion.imageUrl} alt="Suggested Outfit" fluid />
-
-        <h5 className="mt-3">New Clothing Items</h5>
-        <ListGroup>
-          {suggestion.clothingIDs.map((id, index) => (
-            <ListGroup.Item key={index}>Clothing ID: {id}</ListGroup.Item>
-          ))}
-        </ListGroup>
+      <Modal.Body className="text-center">
+        <ImageComponent 
+          src={suggestion.imageUrl} 
+          alt="Suggested Outfit" 
+          fluid 
+          className="mb-3"
+          style={{ maxHeight: '250px' }}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Close</Button>
-        <Button variant="success" onClick={handleAccept}>Make This My Outfit</Button>
+        <Button 
+          variant="dark" 
+          onClick={handleAccept}
+          style={{ background: '#000', borderColor: '#000' }}
+        >
+          Make This My Outfit
+        </Button>
       </Modal.Footer>
     </Modal>
   );

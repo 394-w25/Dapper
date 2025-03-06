@@ -21,6 +21,7 @@ import HomePage from './pages/Home/HomePage';
 import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
 import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
+import FriendsPage from './pages/Friends/FriendsPage';
 import './App.css';
 import { useNavigate } from 'react-router';
 import WelcomePage from './pages/Onboarding/WelcomePage';
@@ -70,6 +71,7 @@ const App = () => {
               <Route path="/outfit-builder" element={<OutfitBuilder />} />
               <Route path="/outfit-builder-new" element={<OutfitBuilderPageNew />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/friends" element={<FriendsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
@@ -79,16 +81,6 @@ const App = () => {
     </>
   );
 };
-
-// const AppWrapper = () => (
-//   <Router>
-//     <SmartphoneFrame>
-//       <App />
-//     </SmartphoneFrame>
-//   </Router>
-// );
-
-// export default AppWrapper;
 
 const AppWrapper = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);

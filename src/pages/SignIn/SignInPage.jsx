@@ -30,14 +30,24 @@ const Login = () => {
                         photoURL: result.photoURL,
                         claimedItems: [],
                         foundItems: [],
-                        about: ''
+                        about: '',
+                        newUser: true,
+                        styles: [],
                     }
                 };
 
                 await (update(userData));
+                navigate('/onboarding');
             }
 
-            navigate('/');
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.newUser) {
+                    navigate('/onboarding');
+                } else {
+                    navigate('/');
+                }
+            }
 
         } catch (err) {
             setError(err.message);

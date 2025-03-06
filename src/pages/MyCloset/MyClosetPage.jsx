@@ -229,7 +229,7 @@ const MyClosetPage = () => {
           if top-level is Outfits, show only "All" button. */}
       <Container fluid className="category-filter-container">
         <div className="category-filter">
-          <ButtonGroup className="categories mb-3">
+          <ButtonGroup className="categories">
             {selectedTopFilter === "Outfits" ? (
               // Only show "All"
               <Nav.Item>

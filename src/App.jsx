@@ -21,9 +21,16 @@ import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
 import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
 import './App.css';
+import { useNavigate } from 'react-router';
+import WelcomePage from './pages/Onboarding/WelcomePage';
+import SelectPhotosPage from './pages/Onboarding/SelectPhotosPage';
+import SelectTagsPage from './pages/Onboarding/SelectTagsPage';
+import { useDbData } from './utilities/firebase';
 
 const App = () => {
   const [user, loading, error] = useAuthState();
+  const navigate = useNavigate();
+  const [userData] = useDbData(user ? `users/${user.uid}` : null);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -37,11 +44,17 @@ const App = () => {
     <>
       {!user ? (
         <SignInPage />
+      ) : userData?.newUser ? (
+        <Routes>
+          <Route path="/onboarding" element={<WelcomePage />} />
+          <Route path="/onboarding/selectphotos" element={<SelectPhotosPage />} />
+          <Route path="/onboarding/selecttags" element={<SelectTagsPage />} />
+        </Routes>
       ) : (
         <>
           <div className="main-content">
             <Routes>
-              <Route path="/" element={<HomePage user={user}/>} />
+              <Route path="/" element={<HomePage user={user} />} />
               <Route path="/mycloset" element={<MyClosetPage />} />
               <Route path="/inspiration" element={<InspirationPage />} />
               <Route path="/inspiration/find" element={<FindInspirationPage />} />
@@ -49,7 +62,7 @@ const App = () => {
               <Route path="/inspiration/upload/details" element={<UploadDetailsPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />
-              <Route path="/chat/:chatId" element={<ChatScreen />} />  {/* ✅ Correct Route */}
+              <Route path="/chat/:chatId" element={<ChatScreen />} />
               <Route path="/outfit-feedback/:outfitId" element={<OutfitFeedbackPage />} />
               <Route path="/review-edits/:chatId" element={<SuggestionModal />} />
               <Route path="/discover" element={<DiscoverPage />} />
@@ -60,7 +73,7 @@ const App = () => {
           </div>
           <NavigationBar />
         </>
-      )};
+      )}
     </>
   );
 };

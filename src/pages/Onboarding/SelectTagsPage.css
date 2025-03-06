@@ -1,0 +1,63 @@
+.select-tags-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    height: 100vh; /* Ensures full height of the viewport */
+    padding: 0 10px 10px 10px;
+    overflow-y: auto; /* Ensures scrolling when needed */
+    text-align: center;
+    justify-content: flex-start; /* Keeps the content at the top initially */
+    padding-top: 50px;
+  }
+  
+  .select-tags-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Ensures the content takes full height of the parent */
+  }
+  
+  .buttons-group {
+    margin-top: auto; /* This pushes the buttons group to the bottom */
+    width: 100%; /* Ensures buttons take the full width */
+    padding-top: 20px;
+  }
+  
+  h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .tag-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    overflow-y: auto; /* Enables vertical scroll */
+    padding: 10px;
+  }
+  
+  .tag-card {
+    cursor: pointer;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .tag-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    font-size: 14px;
+    border: 1px solid #dddddd;
+    padding: 5px;
+  }
+  
+  .tag-card.selected .tag-box {
+    border: 1px solid #dddddd;
+    background-color: #eeeeee;
+  }

@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #faf8fc;
+    background-color: white;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     max-height: 100vh;
     min-height: 100vh;
@@ -41,9 +41,18 @@
 .section-cards {
     border: none;
     border-radius: 10px;
-    background-color: #ffffff;
+    background-color: #fff;
     height: 22vh;
     margin-bottom: 10px;
+}
+
+.section-cards .card-body {
+    padding: 10px 0 0 0;
+}
+
+.section-cards .card-header {
+    border-radius: 10px;
+    border-bottom: 0;
 }
 
 .section-card-header {
@@ -57,7 +66,7 @@
 
 .placeholder-box {
     width: 100%;
-    height: 100px;
+    height: 120px;
     background-color: #e0e0e0;
     border-radius: 8px;
     display: flex;
@@ -69,14 +78,14 @@
 
 .outfit-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    overflow-x: auto;
+    grid-template-columns: repeat(3, 100px);
+    gap: 10px;
+    width: 100%;
 }
 
 .outfit-card {
-    width: 80px;
-    height: 90px;
+    width: 90px;
+    height: 100px;
     background: #fff;
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -99,8 +108,8 @@
 }
 
 .inspiration-card-2 {
-    width: 80px;
-    height: 90px;
+    width: 90px;
+    height: 100px;
     background: #fff;
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -131,8 +140,8 @@
 .outfit-placeholder {
     background-color: #f0f0f0;
     border-radius: 8px;
-    height: 90px;
-    width: 80px;
+    height: 100px;
+    width: 90px;
 }
 
 /* Action button styles */

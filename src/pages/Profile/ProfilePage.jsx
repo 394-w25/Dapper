@@ -32,7 +32,7 @@ const ProfilePage = () => {
         const userOutfits = Object.values(outfitsData)
           .filter(outfit => outfit.createdBy === user.uid)
           .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, 4);
+          .slice(0, 3);
 
         setRecentOutfits(userOutfits);
       }

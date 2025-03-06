@@ -1,0 +1,202 @@
+.friends-page {
+    padding: 20px;
+    background-color: #faf8fc;
+    min-height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+  }
+  
+  .friends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .friends-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .friends-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .friends-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .friends-tab.active {
+    background-color: #000;
+    color: white;
+  }
+  
+  .friends-content, .chats-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .friends-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .friends-action-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #f0eef1;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .friends-action-btn:hover {
+    background-color: #e0dee1;
+  }
+  
+  .friends-list, .chat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .friend-item, .chat-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .friend-item:hover, .chat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+  }
+  
+  .friend-avatar, .chat-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e1e4e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #555;
+    margin-right: 15px;
+    font-size: 18px;
+    overflow: hidden;
+  }
+  
+  .friend-avatar img, .chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .friend-name {
+    font-weight: 500;
+    font-size: 16px;
+  }
+  
+  .chat-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chat-friend-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .chat-latest-message {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+  
+  .no-friends-message, .no-chats-message {
+    text-align: center;
+    color: #666;
+    margin-top: 20px;
+  }
+  
+  .add-friend-container, .manage-friends-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .add-friend-container h3, .manage-friends-container h3 {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  .back-button {
+    padding: 10px;
+    background-color: #f0eef1;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 15px;
+  }
+  
+  .back-button:hover {
+    background-color: #e0dee1;
+  }
+  
+  .friend-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+  
+  .friends-list.manage-mode .friend-item {
+    justify-content: space-between;
+  }
+  
+  .remove-friend-btn {
+    background-color: #f0eef1;
+    color: #d32f2f;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  .remove-friend-btn:hover {
+    background-color: #ffebee;
+  }

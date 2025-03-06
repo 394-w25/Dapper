@@ -20,6 +20,7 @@ import HomePage from './pages/Home/HomePage';
 import NavigationBar from './components/navigation/NavigationBar';
 import { useAuthState } from './utilities/firebase';
 import SmartphoneFrame from './components/phoneframe/SmartphoneFrame';
+import FriendsPage from './pages/Friends/FriendsPage';
 import './App.css';
 
 const App = () => {
@@ -49,31 +50,22 @@ const App = () => {
               <Route path="/inspiration/upload/details" element={<UploadDetailsPage />} />
               <Route path="/add-item" element={<AddItem />} />
               <Route path="/chat" element={<ChatPage />} />
-              <Route path="/chat/:chatId" element={<ChatScreen />} />  {/* ✅ Correct Route */}
+              <Route path="/chat/:chatId" element={<ChatScreen />} />
               <Route path="/outfit-feedback/:outfitId" element={<OutfitFeedbackPage />} />
               <Route path="/review-edits/:chatId" element={<SuggestionModal />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/outfit-builder" element={<OutfitBuilder />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/friends" element={<FriendsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
           <NavigationBar />
         </>
-      )};
+      )}
     </>
   );
 };
-
-// const AppWrapper = () => (
-//   <Router>
-//     <SmartphoneFrame>
-//       <App />
-//     </SmartphoneFrame>
-//   </Router>
-// );
-
-// export default AppWrapper;
 
 const AppWrapper = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);

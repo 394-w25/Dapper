@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get } from "firebase/database";
 import { useAuthState } from "../../utilities/firebase";
-import "./FriendsList.css"; // Import the new styles
+import "./FriendList.css"; // Import the new styles
 
 const FriendsList = () => {
   const [friends, setFriends] = useState([]);

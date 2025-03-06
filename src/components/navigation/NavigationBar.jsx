@@ -40,9 +40,9 @@ const NavigationBar = () => {
               <i className="bi bi-plus"></i>
             </Button>
 
-            <Nav.Link as={NavLink} to="/chat" className="nav-icon" activeclassname="active">
-              <i className="bi bi-chat-dots-fill"></i>
-              <p>Chat</p>
+            <Nav.Link as={NavLink} to="/friends" className="nav-icon" activeclassname="active">
+              <i className="bi bi-people-fill"></i>
+              <p>Friends</p>
             </Nav.Link>
             <Nav.Link as={NavLink} to="/profile" className="nav-icon" activeclassname="active">
               <i className="bi bi-person-circle"></i>

@@ -5,11 +5,10 @@ import "./SelectTagsPage.css"; // Ensure this CSS file matches the styles
 import { useDbUpdate, useAuthState } from "../../utilities/firebase";
 import { useDbData } from "../../utilities/firebase";
 
-const styles = [
-    "Streetwear", "Minimalist", "Preppy", "Business Casual",
-    "Laid-back", "Trendy", "Vintage", "Layered Look",
-    "Casual", "Sporty", "Sophisticated", "Statement Piece"
-];
+const styles = ["Athleisure", "Bright Colors", "Distressed", "Earthy Tones", 
+    "Fitted", "Heavyweight", "High Contrast", "Layered", "Monochrome", "Neutral Colors", 
+    "Oversized", "Performance Fabric", "Retro Silhouettes", "Slim Fit", "Soft Fabric", 
+    "Soft Fabric (suede)", "Structured", "Tapered", "Textured Fabric"];
 
 const SelectTagsPage = () => {
     const [user] = useAuthState();

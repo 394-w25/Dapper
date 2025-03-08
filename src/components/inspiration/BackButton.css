@@ -1,4 +1,4 @@
-.back-button-container {
+.back-button-insp-container {
     display: flex;
     align-items: center;
     padding: 10px 15px;
@@ -8,7 +8,7 @@
     z-index: 10;
 }
 
-.back-button {
+.back-button-insp {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -19,7 +19,7 @@
     color: #333;
 }
 
-.back-button:hover {
+.back-button-insp:hover {
     color: #000;
     background-color: rgba(0, 0, 0, 0.05);
 }

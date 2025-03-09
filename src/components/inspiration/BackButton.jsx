@@ -8,8 +8,8 @@ const BackButton = ({ to }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="back-button-container">
-            <Button variant="light" className="back-button" onClick={() => navigate(to)}>
+        <div className="back-button-insp-container">
+            <Button variant="light" className="back-button-insp" onClick={() => navigate(to)}>
                 <FaArrowLeft size={19} />
             </Button>
         </div>

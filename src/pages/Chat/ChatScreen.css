@@ -1,43 +1,29 @@
 /* Modified ChatScreen.css */
+.main-chat-container {
+  background-color: #faf8fc;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-  background-color: #faf8fc;
-  padding: 0;
+  padding-top: 50px;
   margin: 0;
   overflow: hidden;
 }
 
-.chat-header {
-  padding: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-header h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* Fixed position for the preview button */
+/* preview button */
 .preview-outfits-btn-container {
   position: sticky;
-  top: 55px; /* Just below the header */
-  z-index: 5;
+  top: 80px;
+  z-index: 4;
   padding: 8px 0;
   background-color: #faf8fc;
-  width: 100%;
+  width: 95%;
+  margin-left: 10px;
 }
 
 .preview-outfits-btn {
@@ -66,7 +52,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 70px; /* Space for chat input */
+  margin-bottom: 0px; 
   height: calc(100vh - 180px); /* Calculate height based on viewport minus header, button and input */
 }
 
@@ -126,16 +112,14 @@
 
 /* Chat input box fixed at the bottom */
 .chat-input-container {
-  position: fixed;
-  bottom: 100px; /* Space for the navigation bar */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95%; /* Take up most but not all of phone width */
-  max-width: 345px; /* Ensure it doesn't get too wide */
+  position: sticky;
+  bottom: 60px;
+  width: 100%;
   background: white;
   padding: 10px 15px;
+  padding-bottom: 30px;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  z-index: 100;
+  z-index: 4;
   box-sizing: border-box;
   border-radius: 24px;
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Container, Button } from "react-bootstrap";
 import { PersonCircle, X } from "react-bootstrap-icons";
+import { BsThreeDotsVertical } from 'react-icons/bs';
 import { signOut } from '../../utilities/firebase';
 import { useNavigate } from 'react-router-dom';
 import "./Header.css";
@@ -23,17 +24,17 @@ const Header = ({ title }) => {
       <div className="app-header">
         <Container className="d-flex justify-content-between align-items-center">
           <h4 className="m-0">{title}</h4>
-          <PersonCircle size={28} className="profile-icon" onClick={handleShow} />
+          {/* <PersonCircle size={28} className="profile-icon" onClick={handleShow} /> */}
+          <BsThreeDotsVertical size={20} className="header-menu-icon" onClick={handleShow} />
         </Container>
       </div>
 
       <div className={`profile-popup ${showProfile ? "show" : ""}`}>
-        <div className="profile-header">
-          <h5>My Profile</h5>
+        <div className="profile-header-popup">
+          <h5>Sign Out</h5>
           <X size={24} className="close-icon" onClick={handleClose} />
         </div>
         <div className="profile-body">
-          <p>User details go here...</p>
           <Button variant="danger" onClick={handleSignOut}>Sign Out</Button>
         </div>
       </div>

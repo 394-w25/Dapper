@@ -8,6 +8,7 @@ import { database } from "../../utilities/firebase";
 import { getDatabase, ref, get, set, push } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
+import CustomModal from '../../components/modal/CustomModal';
 
 
 // React icons
@@ -347,25 +348,21 @@ const loadImage = (src) => {
       </Container>
 
       {/* ---- Inspiration Selection Modal ---- */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="mobile-modal">
-  <Modal.Header closeButton>
-    <Modal.Title>Select an Inspiration</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <div className="inspiration-grid">
-      {inspirations.map((inspo, index) => (
-        <div key={index} className="inspo-container">
-          <img
-            src={inspo.imageUrl}
-            alt="Inspiration"
-            className="inspo-thumbnail"
-            onClick={() => handleSelectInspiration(inspo.imageUrl)}
-          />
-        </div>
-      ))}
-    </div>
-  </Modal.Body>
-</Modal>
+      <CustomModal show={showModal} onClose={() => setShowModal(false)} title="Select an Inspiration">
+  <div className="inspiration-grid">
+    {inspirations.map((inspo, index) => (
+      <div key={index} className="inspo-container">
+        <img
+          src={inspo.imageUrl}
+          alt="Inspiration"
+          className="inspo-thumbnail"
+          onClick={() => handleSelectInspiration(inspo.imageUrl)}
+        />
+      </div>
+    ))}
+  </div>
+</CustomModal>
+
 
 {/* ✅ Feedback Request Modal with outfitId */}
 {showFeedbackModal && savedOutfitId && (

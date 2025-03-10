@@ -59,16 +59,16 @@
 }
 
 .add-icon:hover {
-    background-color: #333;  
+    background-color: #333;
 }
 
 .add-icon.active {
     background-color: black;
 }
 
-.add-icon.active i, 
+.add-icon.active i,
 .add-icon:hover i {
-    color: white; 
+    color: white;
 }
 
 /* Ensure even spacing */
@@ -82,10 +82,10 @@
 .nav-modal-body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-  }
-  
-  .nav-modal {
+    gap: 8px;
+}
+
+.nav-modal {
     width: 300px;
     height: 150px;
     display: flex !important;
@@ -95,11 +95,16 @@
     position: fixed !important;
     top: -5%;
     left: 39.8%;
-  }
-  
-  .nav-modal-title {
+}
+
+.nav-modal-title {
     font-size: 20px;
     align-items: left;
     justify-content: left;
-  }
-  
+}
+
+.nav-modal-icon {
+    margin-right: 6px;
+    margin-bottom: 4px;
+    font-size: 16px;
+}

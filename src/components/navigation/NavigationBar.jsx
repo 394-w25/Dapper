@@ -3,8 +3,9 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import CustomModal from '../modal/CustomModal';
+import { FaTshirt, FaLightbulb, FaTrello } from 'react-icons/fa'; 
 import './NavigationBar.css';
 
 const NavigationBar = () => {
@@ -52,35 +53,32 @@ const NavigationBar = () => {
         </Container>
       </Navbar>
 
-      {/* Modal */}
-      <Modal show={showModal} onHide={handleClose} centered dialogClassName="nav-modal">
-        <Modal.Header closeButton>
-          <Modal.Title className="nav-modal-title">Add Item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="nav-modal-body">
+      {/* Custom Modal */}
+      <CustomModal show={showModal} onClose={handleClose} title="Add Item">
+        <div className="nav-modal-body">
           <Button
-            variant="secondary"
-            className="w-100 mb-2"
+            variant="dark"
+            className="w-100 mb-2 nav-modal-btn"
             onClick={() => handleNavigate('/outfit-builder')}
           >
-            Add Outfit
+            <FaTrello className="nav-modal-icon" /> Add Outfit
           </Button>
           <Button
-            variant="secondary"
-            className="w-100 mb-2"
+            variant="dark"
+            className="w-100 mb-2 nav-modal-btn"
             onClick={() => handleNavigate('/add-item')}
           >
-            Add Clothing
+            <FaTshirt className="nav-modal-icon" /> Add Clothing
           </Button>
           <Button
-            variant="secondary"
-            className="w-100"
-            onClick={() => handleNavigate('/add-inspiration')} // herbert change the link here when you create the inspiration page
+            variant="dark"
+            className="w-100 nav-modal-btn"
+            onClick={() => handleNavigate('/inspiration/upload')}
           >
-            Add Inspiration
+            <FaLightbulb className="nav-modal-icon" /> Add Inspiration
           </Button>
-        </Modal.Body>
-      </Modal>
+        </div>
+      </CustomModal>
     </>
   );
 };

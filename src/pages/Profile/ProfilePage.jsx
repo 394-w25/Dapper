@@ -98,7 +98,7 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page">
-      <Header title="My Closet" />
+      <Header title="My Profile" />
       <Container className="profile-page-content">
         <div className="profile-header">
           <img

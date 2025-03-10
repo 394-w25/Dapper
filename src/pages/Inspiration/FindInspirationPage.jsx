@@ -43,7 +43,7 @@ const FindInspirationPage = () => {
     }, [inspirationData]);
 
     useEffect(() => {
-        handleSearch("mens fashion outfits");
+        handleSearch("mens fashion");
     }, []);
 
     const handleSearch = async (query) => {
@@ -55,7 +55,7 @@ const FindInspirationPage = () => {
 
     const handleCategoryClick = (category) => {
         setSelectedCategory(category);
-        handleSearch(category === "All Styles" ? "mens fashion outfits" : `mens ${category.toLowerCase()} fashion outfits`);
+        handleSearch(category === "All Styles" ? "mens fashion" : `mens ${category.toLowerCase()} fashion`);
     };
 
     const openInspirationModal = (inspiration) => {
@@ -137,7 +137,7 @@ const FindInspirationPage = () => {
                         placeholder="Search styles"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSearch(searchQuery)}
+                        onKeyPress={(e) => e.key === "Enter" && handleSearch(`${searchQuery} fashion men`)}
                     />
                     <Button variant="dark" onClick={() => handleSearch(searchQuery)}>Search</Button>
                 </Form.Group>

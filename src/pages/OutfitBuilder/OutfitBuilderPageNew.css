@@ -104,4 +104,80 @@
     font-size: 14px; /* slightly smaller text if you like */
     padding: 6px;    /* smaller padding inside the button */
   }
+
+/* Adjust modal width for mobile */
+.mobile-modal .modal-dialog {
+  max-width: 90%;  /* Ensure it stays within mobile screen */
+  width: 90%;      /* Override Bootstrap's default */
+  margin: 0 auto;  /* Center it properly */
+}
+
+/* Adjust modal content */
+.mobile-modal .modal-content {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Inspiration grid fixes */
+.inspiration-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px; /* Space between images */
+  padding: 10px;
+}
+
+/* Ensure equal spacing and centered images */
+.inspo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45%; /* Each image takes about half the row */
+}
+
+/* Scale images properly */
+.inspo-thumbnail {
+  width: 70px; /* Adjusted size */
+  height: 90px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.inspo-thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.inspiration-image {
+  position: absolute;  /* Position it inside the slot */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* Center it */
+  max-width: 80%;  /* Reduce image width */
+  max-height: 80%; /* Reduce image height */
+  object-fit: contain; /* Maintain aspect ratio */
+  border-radius: 6px;
+}
+
+.success-alert {
+  position: fixed;
   
+  background-color: #28a745; /* Green success */
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-weight: bold;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+/* Fade in and out animation */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}

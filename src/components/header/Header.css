@@ -29,8 +29,8 @@
     position: absolute;
     top: 30px;
     right: -300px;
-    width: 250px;
-    height: 60%;
+    width: 200px;
+    height: 20%;
     background: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     transition: right 0.3s ease-in-out;

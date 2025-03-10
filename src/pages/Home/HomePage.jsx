@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Header from "../../components/header/Header";
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import CustomModal from "../../components/modal/CustomModal";
 import './HomePage.css';
 import { FaTshirt, FaUserFriends } from 'react-icons/fa';
 import { BsClockHistory, BsChatDots, BsLightbulb, BsThreeDotsVertical, BsCompass } from 'react-icons/bs';
@@ -39,7 +40,7 @@ const HomePage = ({ user }) => {
             alt="Profile"
             className="profile-pic"
           />
-          <span style={{ fontSize: '22px'}}>{userData?.displayName}</span>
+          <span style={{ fontSize: '24px' }}>{userData?.displayName}</span>
         </div>
         <BsThreeDotsVertical
           className="menu-icon"
@@ -54,7 +55,7 @@ const HomePage = ({ user }) => {
           .map((action) => (
             <div
               key={action.id}
-              className="action-card" 
+              className="action-card"
               onClick={() => action.action ? action.action() : navigate(`/${action.link}`)}
             >
               <div className="action-title">
@@ -66,31 +67,25 @@ const HomePage = ({ user }) => {
           ))}
       </div>
 
-      <Modal show={showCustomizeModal} onHide={() => setShowCustomizeModal(false)} dialogClassName="customize-modal">
-        <Modal.Header closeButton >
-          <Modal.Title className="customize-modal-title">Customize Home Screen</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {actions.map((action) => (
-            <div key={action.id} className="customize-action d-flex align-items-center justify-content-between">
-              <div className="d-flex align-items-center action-icon">
-                {action.icon}
-                <span>{action.name}</span>
-              </div>
-              <input
-                type="checkbox"
-                checked={action.visible}
-                onChange={() => toggleActionVisibility(action.id)}
-              />
+      {/* Custom Modal */}
+      <CustomModal show={showCustomizeModal} onClose={() => setShowCustomizeModal(false)} title="Customize Home Screen">
+        {actions.map((action) => (
+          <div key={action.id} className="customize-action d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center action-icon">
+              {action.icon}
+              <span>{action.name}</span>
             </div>
-          ))}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" className="save-button" onClick={() => setShowCustomizeModal(false)}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            <input
+              type="checkbox"
+              checked={action.visible}
+              onChange={() => toggleActionVisibility(action.id)}
+            />
+          </div>
+        ))}
+        <Button variant="secondary" className="save-button w-100 mt-3" onClick={() => setShowCustomizeModal(false)}>
+          Save Changes
+        </Button>
+      </CustomModal>
     </div >
   );
 };

@@ -21,6 +21,29 @@ body {
   padding-bottom: 60px;
 }
 
+.smartphone-container-new {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  min-height: 100vh;
+}
+
+.smartphone-new {
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.smartphone-content-new {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
 /* Make it look better on smaller screens */
 @media screen and (max-width: 480px) {
   .App {

@@ -82,6 +82,16 @@ const App = () => {
   );
 };
 
+const SmartphoneScreen = ({ children }) => {
+  return (
+    <div className="smartphone-container-new">
+      <div className="smartphone-new">
+        <div className="smartphone-content-new">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 const AppWrapper = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
 
@@ -96,7 +106,7 @@ const AppWrapper = () => {
 
   return (
     <Router>
-      {isMobile ? <App /> : <SmartphoneFrame><App /></SmartphoneFrame>}
+      {isMobile ? <SmartphoneScreen><App /></SmartphoneScreen> : <SmartphoneFrame><App /></SmartphoneFrame>}
     </Router>
   );
 };

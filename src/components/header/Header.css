@@ -15,13 +15,13 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.profile-icon {
+.header-menu-icon {
     cursor: pointer;
     color: #333;
     transition: color 0.3s ease-in-out;
 }
 
-.profile-icon:hover {
+.header-menu-icon:hover {
     color: #000;
 }
 
@@ -30,7 +30,7 @@
     top: 30px;
     right: -300px;
     width: 250px;
-    height: 70%;
+    height: 60%;
     background: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     transition: right 0.3s ease-in-out;
@@ -44,7 +44,7 @@
     right: 0;
 }
 
-.profile-header {
+.profile-header-popup {
     display: flex;
     justify-content: space-between;
     align-items: center;

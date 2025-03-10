@@ -59,7 +59,7 @@ const NavigationBar = () => {
           <Button
             variant="dark"
             className="w-100 mb-2 nav-modal-btn"
-            onClick={() => handleNavigate('/outfit-builder')}
+            onClick={() => handleNavigate('/outfit-builder-new')}
           >
             <FaTrello className="nav-modal-icon" /> Add Outfit
           </Button>

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 import BackButton from "../../components/inspiration/BackButton";
 import { Container, Button, Form } from "react-bootstrap";
-import { FaArrowLeft, FaCamera, FaRedo } from "react-icons/fa";
+import { FaCamera, FaRedo } from "react-icons/fa";
 import Webcam from "react-webcam";
 import { useAuthState, uploadInspiration, useDbUpdate } from "../../utilities/firebase";
 import "./UploadDetailsPage.css";
@@ -17,12 +17,12 @@ const UploadDetailsPage = () => {
     const [updateData] = useDbUpdate(`inspiration/${user?.uid}`);
 
     const [image, setImage] = useState(null);
-    const [uploadedImage, setUploadedImage] = useState(null);
     const [title, setTitle] = useState("");
     const [tags, setTags] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [loading, setLoading] = useState(false);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
+    const [error, setError] = useState("");
     const webcamRef = useRef(null);
 
     // Handle camera capture
@@ -90,6 +90,29 @@ const UploadDetailsPage = () => {
         }
     };
 
+    const validateImageUrl = (url) => {
+        if (!url.trim()) {
+            setError("Please enter a valid URL.");
+            setImage(null);
+            return;
+        }
+
+        // Create a new Image object to check if the URL loads correctly
+        const img = new Image();
+        img.src = url;
+
+        img.onload = () => {
+            setError("");
+            setImageUrl(url);
+            setImage(url);
+        };
+
+        img.onerror = () => {
+            setError("Failed to load image. Check the URL and try again.");
+            setImage(null);
+        };
+    };
+
     return (
         <div className="upload-details">
             <BackButton to="/inspiration/upload" />
@@ -111,6 +134,34 @@ const UploadDetailsPage = () => {
                             <FaCamera /> Capture Photo
                         </Button>
                     </div>
+                ) : source === "camera-roll" && !image ? (
+                    <Form.Group className="mb-3">
+                        <Form.Label>Upload Image</Form.Label>
+                        <Form.Control
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    setImage(URL.createObjectURL(file));
+                                }
+                            }}
+                        />
+                    </Form.Group>
+                ) : source === "instagram" || source === "pinterest" || source === "reddit" || source === "browser" && !image ? (
+                    // URL Input for Other Sources
+                    <Form.Group className="mb-3">
+                        <Form.Label>Enter Image URL</Form.Label>
+                        <Form.Control
+                            type="text"
+                            // value={imageUrl}
+                            onChange={(e) => {
+                                validateImageUrl(e.target.value);
+                            }}
+                            placeholder="Paste image link"
+                        />
+                        {error && <p className="error-text">{error}</p>}
+                    </Form.Group>
                 ) : image ? (
                     // If image is taken, show the preview
                     <div className="image-preview">
@@ -126,32 +177,8 @@ const UploadDetailsPage = () => {
                             <FaRedo /> Capture Again
                         </Button>
                     </div>
-                ) : source === "camera-roll" ? (
-                    <Form.Group className="mb-3">
-                        <Form.Label>Upload Image</Form.Label>
-                        <Form.Control
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    setImage(URL.createObjectURL(file));
-                                }
-                            }}
-                        />
-                    </Form.Group>
-                ) : (
-                    // URL Input for Other Sources
-                    <Form.Group className="mb-3">
-                        <Form.Label>Enter Image URL</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                            placeholder="Paste image link (Instagram, Pinterest, etc.)"
-                        />
-                    </Form.Group>
-                )}
+                ) : null
+                }
 
                 <Form>
                     <Form.Group className="mb-3">

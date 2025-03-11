@@ -31,7 +31,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 20px 12px 20px;
+  margin: 0 20px 20px 20px;
 }
 
 .user-info-overlapped {
@@ -50,17 +50,6 @@
 .user-name-overlapped {
   font-size: 18px;
   font-weight: 500;
-}
-
-/* Card with placeholders for the user’s outfit items */
-.big-card {
-  width: 90%;
-  margin: 0 auto;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
 }
 
 .big-avatar-placeholder,
@@ -87,7 +76,7 @@
 .action-button {
   background-color: #f0eef1;
   border-radius: 8px;
-  padding: 8px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -107,4 +96,28 @@
 
 .arrow-icon {
   font-size: 1.4em;
+}
+
+.big-card {
+  width: 90%;
+  margin: 0 auto;
+  /* Increase height or padding: */
+  min-height: 200px;       /* formerly 80–100px range */
+  padding: 20px;           /* was 15px, now bigger */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;           /* display flex to center image */
+  align-items: center;
+  justify-content: center;
+}
+
+.outfit-image {
+  /* Constrain the image so it fits in the bigger card */
+  max-width: 100%;
+  max-height: 180px;       /* or some fraction of min-height */
+  object-fit: cover;       /* keep aspect ratio, but fill nicely */
+  border-radius: 6px;
+  margin-bottom: 10px;
 }

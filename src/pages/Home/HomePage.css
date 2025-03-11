@@ -1,132 +1,110 @@
 .home-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: white;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  /* max-height: calc(100vh-80px);
-  min-height: 100vh; */
-  height: calc(100vh-80px);
-  padding: 0 20px 20px 20px;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
   overflow-y: hidden;
+  background-color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.home-header {
+/* The background block that appears at the top, 
+   creating the “overlapped” look */
+.top-overlap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background-color: #f0eef1; 
+  z-index: 0;
+}
+
+/* The main content that sits *over* the top overlap */
+.home-content {
+  position: relative;
+  z-index: 1;
+  margin-top: 100px; 
+  padding-bottom: 20px;
+}
+
+.home-header-overlapped {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 80px;
-  width: 95%;
+  margin: 0 20px 12px 20px;
 }
 
-.user-info {
+.user-info-overlapped {
   display: flex;
   align-items: center;
-  padding-bottom: 0px !important;
 }
 
-.profile-pic {
-  width: 50px !important;
-  height: 50px !important;
+.profile-pic-overlapped {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 12px;
+  object-fit: cover;
 }
 
-.menu-icon {
+.user-name-overlapped {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Card with placeholders for the user’s outfit items */
+.big-card {
+  width: 90%;
+  margin: 0 auto;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.big-avatar-placeholder,
+.big-shirt-placeholder,
+.big-shoes-placeholder {
+  width: 100%;
+  height: 80px;
+  background-color: #e0e0e0;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-actions {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-button {
+  background-color: #f0eef1;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 20px;
   cursor: pointer;
-}
-
-.action-list {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 1200px;
-  padding-top: 15px;
-}
-
-.action-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f0eef1;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 22px;
 }
 
 .action-title {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  padding: 5px;
 }
 
 .action-icon {
-  font-size: 18px;
-  gap: 10px;
+  font-size: 22px;
 }
 
 .arrow-icon {
-  font-size: larger;
+  font-size: 1.4em;
 }
-
-.footer-nav {
-  display: flex;
-  justify-content: space-around;
-}
-
-.add-button {
-  font-size: larger;
-}
-
-.customize-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 15px;
-  margin-bottom: 5px;
-  background-color: #f0eef1;
-  border-radius: 8px;
-}
-
-.customize-action input[type="checkbox"] {
-  transform: scale(1.5); /* Adjust the size here, 1.5 is 1.5 times the original size */
-  margin-right: 10px; /* Add space between checkbox and label */
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.customize-modal {
-  width: 300px;
-  height: 150px;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  position: fixed !important;
-  top: -5%;
-  left: 39.8%;
-}
-
-.customize-modal-title {
-  font-size: 20px;
-  align-items: left;
-}
-
-.save-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #000;
-  margin-bottom: 3px;
-}
-

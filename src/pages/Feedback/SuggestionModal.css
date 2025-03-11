@@ -1,0 +1,106 @@
+.suggestion-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+  }
+  
+  /* Make sure modal dialog is properly centered */
+  .suggestion-modal .modal-dialog {
+    margin: 0 auto !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: calc(100% - 20px) !important;
+    max-width: 320px !important;
+  }.suggestion-modal {
+    width: 95% !important;
+    max-width: 320px !important;
+    margin: 0 auto;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1050 !important;
+  }
+  
+  .modal-sm {
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+  
+  .outfit-comparison {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  @media (max-width: 576px) {
+    .outfit-comparison {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+  
+  .outfit-before, .outfit-after {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .outfit-before h4, .outfit-after h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .outfit-image {
+    max-height: 180px;
+    max-width: 100%;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+  }
+  
+  .outfit-before .outfit-image {
+    border-color: #888;
+  }
+  
+  .outfit-after h4 {
+    color: #4285f4;
+  }
+  
+  .outfit-after .outfit-image {
+    border-color: #4285f4;
+    border-width: 2px;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+  
+  .loading-container p {
+    margin-top: 15px;
+    color: #666;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    padding: 20px;
+    text-align: center;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 8px;
+  }

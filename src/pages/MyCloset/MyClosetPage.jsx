@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../components/header/Header";
 import CustomModal from "../../components/modal/CustomModal";
 import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
@@ -12,7 +12,8 @@ import { FaBagShopping } from 'react-icons/fa6';
 import { TbHanger } from "react-icons/tb";
 import { PiPantsFill } from "react-icons/pi";
 import { GiRunningShoe } from "react-icons/gi";
-import { FiTrash2 } from 'react-icons/fi';
+import { FiTrash2, FiEdit2 } from 'react-icons/fi';
+import BackButton from "../../components/inspiration/BackButton";
 import "./MyClosetPage.css";
 
 const categories = [
@@ -32,6 +33,7 @@ const topLevelFilters = [
 const MyClosetPage = () => {
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [user] = useAuthState();
   const [userData] = useDbData(user ? `users/${user.uid}` : null);
@@ -48,6 +50,8 @@ const MyClosetPage = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   useEffect(() => {
     // If we got a filter from navigation state, use it
@@ -122,55 +126,80 @@ const MyClosetPage = () => {
     setShowDeleteModal(true);
   };
 
-  // Actually delete the item (if it’s clothing). You may also add logic for outfits here if needed.
+  // When user clicks edit button for an outfit
+  const handleEditOutfit = (e, outfit) => {
+    e.stopPropagation(); // Prevent opening the modal
+    navigate('/outfit-builder-new', { state: { editOutfitId: outfit.id } });
+  };
+
+  // Actually delete the item (if it's clothing). You may also add logic for outfits here if needed.
   const confirmDelete = async () => {
     if (!itemToDelete || !user) return;
 
-    // If it's clothing (it has 'category'), we do the old logic
-    if (itemToDelete.category) {
-      // Remove from clothing table
-      await remove(ref(database, `clothing/${itemToDelete.id}`));
+    try {
+      // If it's clothing (it has 'category'), we do the old logic
+      if (itemToDelete.category) {
+        // Remove from clothing table
+        await remove(ref(database, `clothing/${itemToDelete.id}`));
 
-      // Remove from user's closet
-      const updatedCloset = userData.closet.filter(id => id !== itemToDelete.id);
-      await update(ref(database, `users/${user.uid}`), {
-        closet: updatedCloset
-      });
+        // Remove from user's closet
+        const updatedCloset = userData.closet.filter(id => id !== itemToDelete.id);
+        await update(ref(database, `users/${user.uid}`), {
+          closet: updatedCloset
+        });
 
-      // Remove from outfits that use it
-      const outfitsRef = ref(database, 'outfits');
-      const outfitsSnapshot = await get(outfitsRef);
-      if (outfitsSnapshot.exists()) {
-        const outfits = outfitsSnapshot.val();
-        for (const outfitId in outfits) {
-          const outfit = outfits[outfitId];
-          if (outfit.clothingIDs?.includes(itemToDelete.id)) {
-            const updatedClothingIDs = outfit.clothingIDs.filter(id => id !== itemToDelete.id);
-            await update(ref(database, `outfits/${outfitId}`), {
-              clothingIDs: updatedClothingIDs
-            });
+        // Remove from outfits that use it
+        const outfitsRef = ref(database, 'outfits');
+        const outfitsSnapshot = await get(outfitsRef);
+        if (outfitsSnapshot.exists()) {
+          const outfits = outfitsSnapshot.val();
+          for (const outfitId in outfits) {
+            const outfit = outfits[outfitId];
+            if (outfit.clothingIDs?.includes(itemToDelete.id)) {
+              const updatedClothingIDs = outfit.clothingIDs.filter(id => id !== itemToDelete.id);
+              await update(ref(database, `outfits/${outfitId}`), {
+                clothingIDs: updatedClothingIDs
+              });
+            }
           }
         }
+
+        // Remove from local state
+        setClothingItems(clothingItems.filter(item => item.id !== itemToDelete.id));
+        setDeleteMessage("Clothing item deleted successfully!");
+      } else {
+        // If it's an outfit, we do a similar logic:
+        await remove(ref(database, `outfits/${itemToDelete.id}`));
+
+        // Remove from userData.outfits array if it exists
+        if (userData.outfits) {
+          const updatedOutfits = userData.outfits.filter(id => id !== itemToDelete.id);
+          await update(ref(database, `users/${user.uid}`), {
+            outfits: updatedOutfits
+          });
+        }
+
+        // Remove from local state
+        setUserOutfits(userOutfits.filter(o => o.id !== itemToDelete.id));
+        setDeleteMessage("Outfit deleted successfully!");
       }
 
-      // Remove from local state
-      setClothingItems(clothingItems.filter(item => item.id !== itemToDelete.id));
-    } else {
-      // If it's an outfit, we do a similar logic:
-      await remove(ref(database, `outfits/${itemToDelete.id}`));
-
-      // Remove from userData.outfits array
-      const updatedOutfits = userData.outfits.filter(id => id !== itemToDelete.id);
-      await update(ref(database, `users/${user.uid}`), {
-        outfits: updatedOutfits
-      });
-
-      // Remove from local state
-      setUserOutfits(userOutfits.filter(o => o.id !== itemToDelete.id));
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+      setDeleteSuccess(true);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setDeleteSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setDeleteMessage("Error deleting item. Please try again.");
+      setDeleteSuccess(true);
+      setTimeout(() => {
+        setDeleteSuccess(false);
+      }, 3000);
     }
-
-    setShowDeleteModal(false);
-    setItemToDelete(null);
   };
 
   const cancelDelete = () => {
@@ -206,6 +235,7 @@ const MyClosetPage = () => {
 
   return (
     <div className="mycloset">
+      <BackButton to={-1} />
       <Header title="My Closet" />
 
       {/* Top-level filter: All, Clothing, Outfits */}
@@ -261,6 +291,11 @@ const MyClosetPage = () => {
 
       {/* Grid */}
       <Container className="mycloset-content">
+        {deleteSuccess && (
+          <div className="delete-success-message">
+            {deleteMessage}
+          </div>
+        )}
         <Row className="clothing-grid">
           {itemsToDisplay.length > 0 ? (
             itemsToDisplay.map((item, index) => (
@@ -273,10 +308,18 @@ const MyClosetPage = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteClick(item);
-                    }}
+                      }}
                     >
                       <FiTrash2 />
                     </button>
+                    {item.isOutfit && (
+                      <button
+                        className="edit-button"
+                        onClick={(e) => handleEditOutfit(e, item)}
+                      >
+                        <FiEdit2 />
+                      </button>
+                    )}
                   </div>
 
                   {/* Show "Get Feedback" button only for outfits */}
@@ -322,6 +365,9 @@ const MyClosetPage = () => {
                 {selectedItem.createdAt && (
                   <p><strong>Created At:</strong> {new Date(selectedItem.createdAt).toLocaleDateString()}</p>
                 )}
+                {selectedItem.updatedAt && (
+                  <p><strong>Last Updated:</strong> {new Date(selectedItem.updatedAt).toLocaleDateString()}</p>
+                )}
               </div>
             ) : (
               <div className="modal-details">
@@ -336,6 +382,18 @@ const MyClosetPage = () => {
             )}
 
             <div className="footer-buttons">
+              {selectedItem.isOutfit && (
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate('/outfit-builder-new', { state: { editOutfitId: selectedItem.id } });
+                  }}
+                  className="edit-item-btn"
+                >
+                  <FiEdit2 /> Edit
+                </Button>
+              )}
               <Button
                 variant="danger"
                 onClick={() => handleDeleteClick(selectedItem)}

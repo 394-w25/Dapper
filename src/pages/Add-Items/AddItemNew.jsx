@@ -107,7 +107,7 @@ const AddItem = () => {
 
   // Save Item to Firebase
   const handleSave = async () => {
-    if (!item.name || !item.category) {
+    if (!item.name || !item.category || !item.imageUrl) {
       alert("Please fill all required fields.");
       return;
     }
@@ -284,6 +284,7 @@ const AddItem = () => {
           </div>
         ) : uploadMode === "camera" && isCameraOpen ? (
           <div className="camera-container">
+            <p className="take-photo-text">Take photo of your item<span className="text-danger">*</span></p>
             <Webcam
               audio={false}
               ref={webcamRef}
@@ -297,7 +298,7 @@ const AddItem = () => {
           </div>
         ) : uploadMode === "upload" && !image ? (
           <Form.Group className="mb-3">
-            <Form.Label>Upload Image</Form.Label>
+            <Form.Label>Upload Image<span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="file"
               accept="image/*"
@@ -312,7 +313,7 @@ const AddItem = () => {
         ) : uploadMode === "url" && !image ? (
           // URL Input for Other Sources
           <Form.Group className="mb-3">
-            <Form.Label>Enter Image URL</Form.Label>
+            <Form.Label>Enter Image URL<span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               // value={imageUrl}
@@ -344,7 +345,7 @@ const AddItem = () => {
         {/* Form Fields */}
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Item Name</Form.Label>
+            <Form.Label>Item Name <span className="text-danger">*</span></Form.Label>
             <Form.Control type="text" name="name" value={item.name} onChange={handleChange} />
           </Form.Group>
 

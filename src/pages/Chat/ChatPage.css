@@ -1,9 +1,10 @@
 .chat-list-container {
   padding: 20px;
   background-color: #faf8fc;
-  min-height: 100vh;
+  height: 75vh; /* Set fixed height instead of min-height */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevent scrolling */
 }
 
 .chat-list {
@@ -11,6 +12,8 @@
   flex-direction: column;
   gap: 12px;
   padding-top: 70px; /* Add padding for the header */
+  overflow-y: auto; /* Allow scrolling within the list if needed */
+  flex: 1; /* Take up remaining space */
 }
 
 .chat-list-title {

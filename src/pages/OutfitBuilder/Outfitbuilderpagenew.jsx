@@ -10,7 +10,7 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
 import { useLocation, useNavigate } from 'react-router-dom';
 
-// React icons
+// Icons
 import { FaTshirt } from 'react-icons/fa';
 import { PiPantsFill } from "react-icons/pi";
 import { GiRunningShoe } from "react-icons/gi";
@@ -34,13 +34,20 @@ const categoryMap = {
   Accessory: "Accessory",
 };
 
+// *** Customize these constants to your liking ***
+const TARGET_HEIGHT = 80;          // Each item up to 80px tall
+const SPACING = 10;               // Gap on left + between items
+const MAX_CANVAS_WIDTH = 280;     // We won't let it exceed 280
+const CANVAS_HEIGHT = 100;        // Canvas is 100px tall
+
 const OutfitBuilderPageNew = () => {
   const [user] = useAuthState();
   const db = getDatabase();
   const storage = getStorage();
-  const outfitRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const outfitCanvasRef = useRef(null);
 
   const [outfitItems, setOutfitItems] = useState({});
   const [clothingItems, setClothingItems] = useState([]);
@@ -48,40 +55,32 @@ const OutfitBuilderPageNew = () => {
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [inspirations, setInspirations] = useState([]);
-  const [savedOutfitId, setSavedOutfitId] = useState(null); // ✅ Store saved outfitId
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false); // ✅ Control feedback modal
+
+  const [savedOutfitId, setSavedOutfitId] = useState(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [outfitName, setOutfitName] = useState("My Outfit");
 
-  // Add loadOutfit function to load existing outfit data
+  // -------------------------
+  // Load existing outfit if editing
+  // -------------------------
   const loadOutfit = async (outfitId) => {
     try {
-      console.log("Loading outfit with ID:", outfitId);
-      const outfitRef = ref(database, `outfits/${outfitId}`);
-      const snapshot = await get(outfitRef);
+      const outfitDataRef = ref(db, `outfits/${outfitId}`);
+      const snapshot = await get(outfitDataRef);
 
       if (snapshot.exists()) {
         const outfitData = snapshot.val();
-        console.log("Outfit data loaded:", outfitData);
+        if (outfitData.name) setOutfitName(outfitData.name);
         
-        // Set the outfit name
-        if (outfitData.name) {
-          setOutfitName(outfitData.name);
-        }
-
-        // If there are clothing IDs in the outfit, load them
+        // Load clothing items
         if (outfitData.clothingIDs && outfitData.clothingIDs.length > 0) {
           const newOutfitItems = {};
-          
-          // Load each clothing item
           for (const clothingId of outfitData.clothingIDs) {
-            const clothingRef = ref(database, `clothing/${clothingId}`);
+            const clothingRef = ref(db, `clothing/${clothingId}`);
             const clothingSnapshot = await get(clothingRef);
-            
             if (clothingSnapshot.exists()) {
               const clothingData = { id: clothingId, ...clothingSnapshot.val() };
-              
-              // Determine the category and add to outfitItems
               if (clothingData.category === "Tops") {
                 newOutfitItems.Tops = clothingData;
               } else if (clothingData.category === "Bottoms") {
@@ -95,13 +94,9 @@ const OutfitBuilderPageNew = () => {
               }
             }
           }
-          
-          // Set the outfit items
           setOutfitItems(newOutfitItems);
-          console.log("Outfit items loaded:", newOutfitItems);
         }
-        
-        // Success message
+
         setSuccessMessage("Outfit loaded for editing");
         setTimeout(() => setSuccessMessage(""), 3000);
       } else {
@@ -116,29 +111,29 @@ const OutfitBuilderPageNew = () => {
     }
   };
 
-  // Check for editing mode on mount
   useEffect(() => {
     if (location.state && location.state.editOutfitId) {
       const outfitId = location.state.editOutfitId;
-      console.log("Edit mode detected, outfit ID:", outfitId);
       setSavedOutfitId(outfitId);
       setIsEditing(true);
       loadOutfit(outfitId);
     }
   }, [location]);
 
-  // Fetch user's clothing
+  // -------------------------
+  // Fetch user clothing
+  // -------------------------
   useEffect(() => {
     if (!user) return;
     const fetchUserClothing = async () => {
-      const userRef = ref(database, `users/${user.uid}/closet`);
+      const userRef = ref(db, `users/${user.uid}/closet`);
       const userSnapshot = await get(userRef);
       if (userSnapshot.exists()) {
         const clothingIds = userSnapshot.val();
         const clothingDetails = [];
         for (const clothingId of clothingIds) {
-          const clothingRef = ref(database, `clothing/${clothingId}`);
-          const clothingSnapshot = await get(clothingRef);
+          const clothingDataRef = ref(db, `clothing/${clothingId}`);
+          const clothingSnapshot = await get(clothingDataRef);
           if (clothingSnapshot.exists()) {
             clothingDetails.push({ id: clothingId, ...clothingSnapshot.val() });
           }
@@ -149,11 +144,13 @@ const OutfitBuilderPageNew = () => {
     fetchUserClothing();
   }, [user]);
 
-  // Fetch inspirations from Firebase
+  // -------------------------
+  // Fetch user inspirations
+  // -------------------------
   useEffect(() => {
     if (!user) return;
     const fetchInspirations = async () => {
-      const inspirationRef = ref(database, `inspiration/${user.uid}/inspirations`);
+      const inspirationRef = ref(db, `inspiration/${user.uid}/inspirations`);
       const inspirationSnapshot = await get(inspirationRef);
       if (inspirationSnapshot.exists()) {
         const inspirationsList = Object.values(inspirationSnapshot.val());
@@ -163,18 +160,107 @@ const OutfitBuilderPageNew = () => {
     fetchInspirations();
   }, [user]);
 
-  // Drag & drop
+  // -------------------------
+  // Redraw the canvas whenever outfitItems changes
+  // -------------------------
+  useEffect(() => {
+    drawCanvas();
+  }, [outfitItems]);
+
+  const drawCanvas = async () => {
+    const canvas = outfitCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    // 1) Gather categories (excluding Inspiration)
+    const catKeys = Object.keys(outfitItems).filter(k => k !== "Inspiration");
+    if (catKeys.length === 0) {
+      // no items => clear canvas, done
+      canvas.width = MAX_CANVAS_WIDTH;
+      canvas.height = CANVAS_HEIGHT;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    // 2) Load the images
+    const images = [];
+    for (let cat of catKeys) {
+      const item = outfitItems[cat];
+      if (!item || !item.imageUrl) continue;
+      const img = await loadImage(item.imageUrl);
+      images.push(img);
+    }
+    if (images.length === 0) return;
+
+    // 3) Measure total needed width if each image is drawn at TARGET_HEIGHT
+    // We'll store them in an array so we know width/height
+    const sizedImages = images.map(img => {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      const w = ratio * TARGET_HEIGHT; // scale to 80px tall
+      return { img, width: w, height: TARGET_HEIGHT };
+    });
+
+    const totalItemsWidth = sizedImages.reduce((acc, s) => acc + s.width, 0);
+    // Number of gaps = images.length + 1 (left edge + between + right edge)
+    const neededWidth = totalItemsWidth + SPACING * (images.length + 1);
+
+    // 4) Decide final canvas width & scale factor
+    let finalWidth;
+    let scale = 1;
+
+    if (neededWidth <= MAX_CANVAS_WIDTH) {
+      // If it fits, canvas width = neededWidth
+      finalWidth = neededWidth;
+    } else {
+      // If it's too big, scale down to fit in MAX_CANVAS_WIDTH
+      finalWidth = MAX_CANVAS_WIDTH;
+      scale = MAX_CANVAS_WIDTH / neededWidth;
+    }
+
+    // 5) Now set the canvas dimensions
+    canvas.width = finalWidth;
+    canvas.height = CANVAS_HEIGHT;
+
+    // Clear it out
+    ctx.clearRect(0, 0, finalWidth, CANVAS_HEIGHT);
+
+    console.log("DEBUG: neededWidth =", neededWidth, ", scale =", scale, ", finalWidth =", finalWidth);
+
+    // 6) Actually draw
+    let xPos = SPACING * scale; // left margin scaled
+    sizedImages.forEach((s, i) => {
+      const wScaled = s.width * scale;
+      const hScaled = s.height * scale;
+      const yPos = (CANVAS_HEIGHT - hScaled) / 2;
+      console.log(`DEBUG: Drawing item ${i} at x=${xPos}, y=${yPos}, w=${wScaled}, h=${hScaled}`);
+      ctx.drawImage(s.img, xPos, yPos, wScaled, hScaled);
+      xPos += wScaled + (SPACING * scale);
+    });
+  };
+
+  // Helper to load image with crossOrigin
+  const loadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  };
+
+  /* ---------------------------------------------
+     Drag & Drop
+  --------------------------------------------- */
   const handleDragStart = (event, item) => {
-    event.dataTransfer.setData('clothingItem', JSON.stringify(item));
+    event.dataTransfer.setData("clothingItem", JSON.stringify(item));
   };
 
   const handleDrop = (event, category) => {
     event.preventDefault();
     if (category === "Inspiration") return;
-
-    const item = JSON.parse(event.dataTransfer.getData('clothingItem'));
+    const item = JSON.parse(event.dataTransfer.getData("clothingItem"));
     const requiredCategory = categoryMap[category];
-
     if (item.category === requiredCategory) {
       setOutfitItems(prev => ({ ...prev, [category]: item }));
     } else {
@@ -194,227 +280,190 @@ const OutfitBuilderPageNew = () => {
     setOutfitItems({});
   };
 
-  // Handle selecting an inspiration
+  /* ---------------------------------------------
+     Inspiration
+  --------------------------------------------- */
   const handleSelectInspiration = (imageUrl) => {
     setOutfitItems(prev => ({ ...prev, Inspiration: { imageUrl } }));
     setShowModal(false);
   };
 
-  // **SAVE OUTFIT FUNCTION**
+  /* ---------------------------------------------
+     SAVE OUTFIT (from the canvas)
+  --------------------------------------------- */
   const handleSaveOutfit = async () => {
     if (!user) return;
+    const realClothingKeys = Object.keys(outfitItems).filter(cat => cat !== "Inspiration");
+    if (realClothingKeys.length === 0) {
+      alert("Please add at least one clothing item to the outfit.");
+      return;
+    }
 
     try {
-        console.log("🔄 Generating new outfit image...");
+      const canvas = outfitCanvasRef.current;
+      const dataUrl = canvas.toDataURL("image/png");
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
 
-        if (Object.keys(outfitItems).length === 0) {
-            console.warn("⚠️ No clothing items selected!");
-            return;
+      const outfitId = isEditing
+        ? savedOutfitId
+        : push(ref(db, "outfits")).key;
+
+      // Upload
+      const imageRef = storageRef(storage, `outfits/${outfitId}.png`);
+      await uploadBytes(imageRef, blob);
+      const imageUrl = await getDownloadURL(imageRef);
+
+      // Gather clothing IDs
+      const clothingIDs = realClothingKeys.map(cat => outfitItems[cat].id);
+
+      // Build or update
+      let outfitData = {};
+      if (isEditing) {
+        const existingSnap = await get(ref(db, `outfits/${outfitId}`));
+        if (existingSnap.exists()) {
+          outfitData = existingSnap.val() || {};
         }
+        outfitData.clothingIDs = clothingIDs;
+        outfitData.imageUrl = imageUrl;
+        outfitData.name = outfitName;
+        outfitData.updatedAt = Date.now();
+      } else {
+        outfitData = {
+          outfitId,
+          clothingIDs,
+          imageUrl,
+          name: outfitName,
+          createdBy: user.uid,
+          createdAt: Date.now()
+        };
+      }
 
-        // **Step 1: Exclude "Inspiration" and fetch clothing images**
-        const filteredOutfitItems = Object.entries(outfitItems)
-            .filter(([category, item]) => category !== "Inspiration") // Remove Inspiration
-            .map(([category, item]) => item);
+      // Save
+      await set(ref(db, `outfits/${outfitId}`), outfitData);
+      await set(ref(db, `users/${user.uid}/outfits/${outfitId}`), outfitData);
 
-        const clothingImageUrls = filteredOutfitItems.map(item => item.imageUrl);
-        const clothingIDs = filteredOutfitItems.map(item => item?.id).filter(id => id !== undefined); // Ensure valid IDs
-
-        if (clothingImageUrls.length === 0) {
-            console.error("❌ No valid clothing images found. Aborting image generation.");
-            return;
-        }
-
-        console.log("📸 Retrieved clothing images:", clothingImageUrls);
-        console.log("🛠 Clothing IDs Before Saving:", clothingIDs);
-
-        // **Step 2: Create structured layout for outfit image**
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        canvas.width = 350;
-        canvas.height = 250;
-
-        const itemWidth = 80, itemHeight = 80;
-        const itemsPerRow = Math.ceil(Math.sqrt(clothingImageUrls.length));
-        const totalRows = Math.ceil(clothingImageUrls.length / itemsPerRow);
-
-        const startX = (canvas.width - itemsPerRow * (itemWidth + 20)) / 2;
-        const startY = (canvas.height - totalRows * (itemHeight + 20)) / 2;
-
-        for (let i = 0; i < clothingImageUrls.length; i++) {
-            const img = await loadImage(clothingImageUrls[i]);
-
-            const x = startX + (i % itemsPerRow) * (itemWidth + 20);
-            const y = startY + Math.floor(i / itemsPerRow) * (itemHeight + 20);
-
-            ctx.drawImage(img, x, y, itemWidth, itemHeight);
-        }
-
-        // **Step 3: Convert canvas to Blob**
-        const dataUrl = canvas.toDataURL("image/png");
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-
-        // **Step 4: Upload new outfit image to Firebase Storage**
-        // If editing, use existing outfit ID, otherwise create a new one
-        const outfitId = isEditing ? savedOutfitId : push(ref(database, 'outfits')).key;
-        const imageRef = storageRef(storage, `outfits/${outfitId}.png`);
-        await uploadBytes(imageRef, blob);
-        const imageUrl = await getDownloadURL(imageRef);
-
-        console.log("✅ New outfit image uploaded successfully:", imageUrl);
-
-        setSavedOutfitId(outfitId); // ✅ Store outfitId immediately
-
-        // **Step 5: Save outfit metadata in Firebase Database**
-        let outfitData = {};
-        
-        // If editing, fetch original data first to preserve fields
-        if (isEditing) {
-            const outfitRef = ref(database, `outfits/${outfitId}`);
-            const snapshot = await get(outfitRef);
-            
-            if (snapshot.exists()) {
-                // Start with all existing data
-                outfitData = snapshot.val();
-                
-                // Update the fields we want to change
-                outfitData.clothingIDs = clothingIDs;
-                outfitData.imageUrl = imageUrl;
-                outfitData.name = outfitName;
-                outfitData.updatedAt = Date.now();
-                
-                console.log("Updating existing outfit with ID:", outfitId);
-                console.log("Updated outfit data:", outfitData);
-            } else {
-                console.error("Cannot find outfit to update!");
-                setSuccessMessage("Error: Cannot find outfit to update");
-                return;
-            }
-        } else {
-            // For new outfits, create all fields
-            outfitData = {
-                outfitId,
-                clothingIDs,
-                imageUrl,
-                name: outfitName,
-                createdBy: user.uid,
-                createdAt: Date.now()
-            };
-        }
-
-        // Save to Firebase
-        await set(ref(database, `outfits/${outfitId}`), outfitData);
-
-        // ✅ **Show success message**
-        setSuccessMessage(isEditing ? "🎉 Outfit updated successfully!" : "🎉 Outfit created successfully!");
-        setTimeout(() => setSuccessMessage(""), 3000); // Clear message after 3s
-    } catch (error) {
-        console.error("❌ Error saving outfit:", error);
-        alert("Failed to save outfit. Please try again.");
+      setSavedOutfitId(outfitId);
+      setSuccessMessage(isEditing ? "🎉 Outfit updated successfully!" : "🎉 Outfit created successfully!");
+      navigate("/mycloset");
+    } catch (err) {
+      console.error("❌ Error saving outfit:", err);
+      alert("Failed to save outfit. Please try again.");
     }
-};
-
-// Helper function to load images
-const loadImage = (src) => {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous"; // Allow cross-origin images
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
-    });
-};
+  };
 
   return (
     <div className="outfit-builder">
       <Header title={isEditing ? `Edit ${outfitName}` : "New Outfit"} />
       <Container>
+        {successMessage && (
+          <div className="success-alert">{successMessage}</div>
+        )}
 
-       {/* Success Message Alert with Floating Position */}
-       {successMessage && (
-        <div className="success-alert">
-          {successMessage}
-        </div>
-      )}
-
-        {/* ---- Outfit Preview Grid ---- */}
+        {/* The drag & drop grid */}
         <Row>
           <Col>
-            <div className="outfit-preview"  ref={outfitRef}>
+            <div className="outfit-preview">
               <Row xs={2} className="g-3">
-              {categories.map(({ name, icon }) => (
-  <Col key={name}>
-    <div
-      className={`category-slot ${outfitItems[name] ? 'filled' : ''}`}
-      onDrop={(e) => handleDrop(e, name)}
-      onDragOver={(e) => e.preventDefault()}
-      onClick={() => name === "Inspiration" && setShowModal(true)}
-    >
-      {/* Only show lock icon for other categories */}
-      {name !== "Inspiration" && (
-        outfitItems[name] ? <FiLock className="lock-icon top-left" /> : <FiUnlock className="lock-icon top-left" />
-      )}
+                {categories.map(({ name, icon }) => (
+                  <Col key={name}>
+                    <div
+                      className={`category-slot ${outfitItems[name] ? "filled" : ""}`}
+                      onDrop={e => handleDrop(e, name)}
+                      onDragOver={e => e.preventDefault()}
+                      onClick={() => name === "Inspiration" && setShowModal(true)}
+                    >
+                      {name !== "Inspiration" && (
+                        outfitItems[name] ? (
+                          <FiLock className="lock-icon top-left" />
+                        ) : (
+                          <FiUnlock className="lock-icon top-left" />
+                        )
+                      )}
+                      {name === "Inspiration" ? (
+                        outfitItems[name] ? (
+                          <img
+                            src={outfitItems[name].imageUrl}
+                            alt="Inspiration"
+                            className="inspiration-image"
+                          />
+                        ) : (
+                          <div className="empty-inspiration">
+                            Click to select an inspiration
+                          </div>
+                        )
+                      ) : (
+                        outfitItems[name] && (
+                          <div className="outfit-item">
+                            <img src={outfitItems[name].imageUrl} alt={name} />
+                            <FiMinusCircle
+                              onClick={() => removeItem(name)}
+                              className="remove-icon"
+                            />
+                          </div>
+                        )
+                      )}
 
-      {/* Inspiration Image Fully Covering the Card */}
-      {name === "Inspiration" ? (
-        outfitItems[name] ? (
-          <img src={outfitItems[name].imageUrl} alt="Inspiration" className="inspiration-image" />
-        ) : (
-          <div className="empty-inspiration">Click to select an inspiration</div>
-        )
-      ) : (
-        outfitItems[name] && (
-          <div className="outfit-item">
-            <img src={outfitItems[name].imageUrl} alt={name} />
-            <FiMinusCircle onClick={() => removeItem(name)} className="remove-icon" />
-          </div>
-        )
-      )}
-
-      {/* Category Label */}
-      <span className="category-label">{icon} {name}</span>
-    </div>
-  </Col>
-))}
-
+                      <span className="category-label">
+                        {icon} {name}
+                      </span>
+                    </div>
+                  </Col>
+                ))}
               </Row>
             </div>
           </Col>
         </Row>
 
-        {/* ---- Category Buttons ---- */}
+        {/* The final canvas (280 wide by default, 100 tall) */}
+        <Row>
+          <Col className="mt-3 text-center">
+            <canvas
+              ref={outfitCanvasRef}
+              width={MAX_CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+              style={{ backgroundColor: "#fff" }}
+            />
+            <p style={{ fontSize: "14px", marginTop: "4px", color: "#666" }}>
+              Outfit Preview (Canvas)
+            </p>
+          </Col>
+        </Row>
+
+        {/* Category Buttons */}
         <Row className="g-0 mt-0 mb-0">
           <Col className="p-0">
-            <ButtonGroup className="categories mb-0">
-              {categories.filter(cat => cat.name !== "Inspiration").map((cat) => (
-                <Button
-                  key={cat.name}
-                  size="sm"
-                  variant={cat.name === selectedCategory ? "secondary" : "outline-secondary"}
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className="category-button"
-                >
-                  {cat.icon} {cat.name}
-                </Button>
-              ))}
+            <ButtonGroup className="categories mb-2">
+              {categories
+                .filter(cat => cat.name !== "Inspiration")
+                .map(cat => (
+                  <Button
+                    key={cat.name}
+                    size="sm"
+                    variant={cat.name === selectedCategory ? "secondary" : "outline-secondary"}
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className="category-button"
+                  >
+                    {cat.icon} {cat.name}
+                  </Button>
+                ))}
             </ButtonGroup>
           </Col>
         </Row>
 
-        {/* ---- Clothing Items ---- */}
+        {/* Clothing items for that category */}
         <Row className="g-0 mt-0 mb-0">
           <Col className="p-0">
             <div className="card-group-wrapper">
               <div className="clothing-card-group">
-                {clothingItems.filter(item => item.category === selectedCategory)
+                {clothingItems
+                  .filter(item => item.category === selectedCategory)
                   .map((item, index) => (
                     <Card
                       key={index}
                       className="clothing-option"
                       draggable
-                      onDragStart={(e) => handleDragStart(e, item)}
+                      onDragStart={e => handleDragStart(e, item)}
                     >
                       <Card.Img variant="top" src={item.imageUrl} />
                     </Card>
@@ -424,59 +473,54 @@ const loadImage = (src) => {
           </Col>
         </Row>
 
-        {/* ---- Footer Buttons ---- */}
+        {/* Footer buttons */}
         <div className="footer-buttons">
-        <Button variant="primary" className="save-button" onClick={handleSaveOutfit}>
+          <Button variant="primary" className="save-button" onClick={handleSaveOutfit}>
             <FiSave /> {isEditing ? "Update" : "Save"}
           </Button>
-                {/* ✅ Show "Share" button only when outfit is saved */}
-                {savedOutfitId !== null && (
-          <Button
+          {savedOutfitId && (
+            <Button
               variant="outline-secondary"
               className="share-button"
               onClick={() => setShowFeedbackModal(true)}
-          >
+            >
               Share
-          </Button>
-      )}
-
-
+            </Button>
+          )}
           <Button variant="outline-secondary" className="reset-button" onClick={handleReset}>
             <FiX /> Reset
           </Button>
         </div>
-
       </Container>
 
-      {/* ---- Inspiration Selection Modal ---- */}
+      {/* Inspiration Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="mobile-modal">
-  <Modal.Header closeButton>
-    <Modal.Title>Select an Inspiration</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <div className="inspiration-grid">
-      {inspirations.map((inspo, index) => (
-        <div key={index} className="inspo-container">
-          <img
-            src={inspo.imageUrl}
-            alt="Inspiration"
-            className="inspo-thumbnail"
-            onClick={() => handleSelectInspiration(inspo.imageUrl)}
-          />
-        </div>
-      ))}
-    </div>
-  </Modal.Body>
-</Modal>
+        <Modal.Header closeButton>
+          <Modal.Title>Select an Inspiration</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="inspiration-grid">
+            {inspirations.map((inspo, index) => (
+              <div key={index} className="inspo-container">
+                <img
+                  src={inspo.imageUrl}
+                  alt="Inspiration"
+                  className="inspo-thumbnail"
+                  onClick={() => handleSelectInspiration(inspo.imageUrl)}
+                />
+              </div>
+            ))}
+          </div>
+        </Modal.Body>
+      </Modal>
 
-{/* ✅ Feedback Request Modal with outfitId */}
-{showFeedbackModal && savedOutfitId && (
+      {/* Feedback modal */}
+      {showFeedbackModal && savedOutfitId && (
         <FeedbackRequestModal
-          outfitId={savedOutfitId} // ✅ Pass saved outfitId
+          outfitId={savedOutfitId}
           onClose={() => setShowFeedbackModal(false)}
         />
       )}
-
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import SuggestionModal from "../Feedback/SuggestionModal";
 import OutfitPreviewModal from "./OutfitPreviewModal";
 import { Send } from "lucide-react"; // Import Send icon
+import BackButton from "../../components/inspiration/BackButton";
 import "./ChatScreen.css";
 
 const ChatScreen = () => {
@@ -136,6 +137,7 @@ const ChatScreen = () => {
 
   return (
     <div className="main-chat-container">
+      <BackButton to={"/chat"} />
       <Header title={friendName || "Chat"} />
 
       <div className="preview-outfits-btn-container">

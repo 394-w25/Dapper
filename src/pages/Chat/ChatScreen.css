@@ -13,6 +13,7 @@
   padding-top: 50px;
   margin: 0;
   overflow: hidden;
+  min-height: 100%;
 }
 
 /* preview button */
@@ -53,7 +54,7 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 0px; 
-  height: calc(100vh - 180px); /* Calculate height based on viewport minus header, button and input */
+  min-height: calc(100vh - 250px); /* Calculate height based on viewport minus header, button and input */
 }
 
 /* Message bubble styling */
@@ -114,7 +115,7 @@
 .chat-input-container {
   position: sticky;
   bottom: 60px;
-  width: 100%;
+  width: 350px;
   background: white;
   padding: 10px 15px;
   padding-bottom: 30px;

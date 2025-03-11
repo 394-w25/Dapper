@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, get, update } from "firebase/database";
 import { useAuthState, useDbData } from "../../utilities/firebase";
-// import Header from "../../components/header/Header";
+import Header from "../../components/header/Header";
 import FriendList from "./FriendList";
 import UserSearchBar from "./UserSearchBar";
 import "./FriendsPage.css";
@@ -121,14 +121,7 @@ const FriendsPage = () => {
 
   return (
     <div className="friends-page">
-      <div className="friends-header">
-        <h2>My Friends</h2>
-        <img
-          src={userData?.photoURL}
-          alt="Profile"
-          className="profile-pic"
-        />
-      </div>
+      <Header title="My Friends" />
 
       {/* Tabs */}
       <div className="friends-tabs">
@@ -197,7 +190,7 @@ const FriendsPage = () => {
                 className="back-button"
                 onClick={() => setShowManageFriends(false)}
               >
-                Back to Friends
+                Back
               </button>
             </div>
           ) : (

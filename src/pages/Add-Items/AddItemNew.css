@@ -14,6 +14,11 @@
   margin-top: 5px;
 }
 
+/* Required field asterisk styling */
+.text-danger {
+  color: #dc3545 !important;
+}
+
 /* Upload Options Buttons */
 .upload-actions-add-item {
   display: flex;

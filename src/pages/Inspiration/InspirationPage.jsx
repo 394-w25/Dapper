@@ -6,6 +6,7 @@ import CustomModal from "../../components/modal/CustomModal";
 import { Container, Button, ListGroup, Card, Form } from "react-bootstrap";
 import { FaFolder, FaPlus, FaEye } from "react-icons/fa";
 import { FiTrash2 } from 'react-icons/fi';
+import BackButton from "../../components/inspiration/BackButton";
 import "./InspirationPage.css";
 
 const InspirationPage = () => {
@@ -240,6 +241,7 @@ const InspirationPage = () => {
 
     return (
         <div className="main-inspiration">
+            <BackButton to={-1} />
             <Header title="Outfit Inspiration" />
             <Container className="inspiration-container">
                 {/* Folder & View Buttons */}

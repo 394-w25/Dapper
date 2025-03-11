@@ -89,13 +89,9 @@ const WelcomePage = () => {
                     <i className="bi bi-image me-2"></i> Upload from Camera Roll
                 </button>
 
-                <div className="or-divider">
+                {/* <div className="or-divider">
                     <span className="text-muted">or</span>
-                </div>
-
-                <button className="btn btn-outline-secondary w-100 mb-3 mt-2">
-                    <i className="bi bi-pinterest me-2"></i> Connect Pinterest Account
-                </button>
+                </div> */}
 
                 <p className="text-muted small">
                     Uploaded inspiration can improve our ability to suggest outfits and styles you like

@@ -351,13 +351,13 @@ useEffect(() => {
           {/* Form Fields */}
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Item Name</Form.Label>
+              <Form.Label>Item Name <span className="text-danger">*</span></Form.Label>
               <Form.Control type="text" name="name" value={item.name} onChange={handleChange} />
             </Form.Group>
 
             {/* Category Selection - Opens Modal */}
             <Form.Group className="mb-3">
-              <Form.Label>Category</Form.Label>
+              <Form.Label>Category <span className="text-danger">*</span></Form.Label>
               <Button variant="outline-dark" className="w-100" onClick={() => setShowCategoryModal(true)}>
                 {item.category || "Select Category"}
               </Button>

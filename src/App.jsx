@@ -6,6 +6,7 @@ import ChatScreen from './pages/Chat/ChatScreen';
 import ClosetPage from './pages/Closet/ClosetPage';
 import MyClosetPage from './pages/MyCloset/MyClosetPage';
 import AddItem from './pages/Add-Items/AddItem';
+import AddItemNew from './pages/Add-Items/AddItemNew';
 import DiscoverPage from './pages/Discover/DiscoverPage';
 import OutfitBuilder from './pages/OutfitBuilder/OutfitBuilderPage';
 import OutfitBuilderPageNew from './pages/OutfitBuilder/Outfitbuilderpagenew';
@@ -62,7 +63,8 @@ const App = () => {
               <Route path="/inspiration/find" element={<FindInspirationPage />} />
               <Route path="/inspiration/upload" element={<UploadInspirationPage />} />
               <Route path="/inspiration/upload/details" element={<UploadDetailsPage />} />
-              <Route path="/add-item" element={<AddItem />} />
+              {/* <Route path="/add-item" element={<AddItem />} /> */}
+              <Route path="/add-item" element={<AddItemNew />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/chat/:chatId" element={<ChatScreen />} />
               <Route path="/outfit-feedback/:outfitId" element={<OutfitFeedbackPage />} />
@@ -104,9 +106,15 @@ const AppWrapper = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // the intention here is to remove the smartphone frame for mobile view
+  // but it's not working as expected so I'm just going to leave it as is
+  // will come back to this later if we have time
   return (
+    // <Router>
+    //   {isMobile ? <SmartphoneScreen><App /></SmartphoneScreen> : <SmartphoneFrame><App /></SmartphoneFrame>}
+    // </Router>
     <Router>
-      {isMobile ? <SmartphoneScreen><App /></SmartphoneScreen> : <SmartphoneFrame><App /></SmartphoneFrame>}
+      <SmartphoneFrame><App /></SmartphoneFrame>
     </Router>
   );
 };

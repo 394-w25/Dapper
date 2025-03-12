@@ -1,60 +1,80 @@
-.add-item {
-    padding-top: 80px;
-    background-color: #fff;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.add-item-new {
+  padding-top: 30px;
+  background-color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 25px;
 }
 
-/* 
+.take-photo-text {
+  margin-bottom: 5px;
+  margin-right: 140px; /* bad code here */
+}
 
+.error-text {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
 
-  .upload-options {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
-  }
-  
-  .upload-option {
-    width: 30%;
-    border-radius: 8px !important;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd !important;
-  }
-  
-  .upload-option.active {
-    background-color: #000 !important;
-    color: #fff !important;
-  }
-  
-  .image-preview {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f1f1f1;
-    height: 200px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .uploaded-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-  
-  .add-photo-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .video-stream {
-    width: 100%;
-    border-radius: 10px;
-  }
-   */
+/* Required field asterisk styling */
+.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Upload Options Buttons */
+.upload-actions-add-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 15px;
+}
+
+.upload-button-add-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 12px;
+  width: 32%;
+  justify-content: center;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.upload-button-add-item.active {
+  background: black !important;
+  color: white !important;
+  border: none;
+}
+
+/* Success Modal Styling */
+.success-modal-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.success-modal-content p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.success-modal-content .ok-button {
+  background-color: #28a745;
+  border: none;
+  font-size: 16px;
+  padding: 5px 15px;
+  width: 90%;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+  margin-top: 5px;
+}
+
+.success-modal-content .ok-button:hover {
+  background-color: #218838;
+}

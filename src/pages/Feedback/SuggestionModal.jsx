@@ -1,28 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, get, update, push, set } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import ImageComponent from "react-bootstrap/Image";
+import "./SuggestionModal.css";
 
 const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user }) => {
   const [suggestion, setSuggestion] = useState(null);
+  const [originalOutfit, setOriginalOutfit] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const db = getDatabase();
 
   useEffect(() => {
     if (!suggestionId) return;
+    setLoading(true);
+    setError(null);
 
-    // Fetch the specific suggestion
-    const fetchSuggestion = async () => {
-      const suggestionRef = ref(db, `outfits_suggestions/${suggestionId}`);
-      const snapshot = await get(suggestionRef);
-      if (snapshot.exists()) {
-        setSuggestion(snapshot.val());
-      } else {
-        console.warn("Suggestion not found");
+    // Fetch the specific suggestion and original outfit
+    const fetchData = async () => {
+      try {
+        // Fetch suggestion
+        const suggestionRef = ref(db, `outfits_suggestions/${suggestionId}`);
+        const suggestionSnapshot = await get(suggestionRef);
+        
+        if (suggestionSnapshot.exists()) {
+          const suggestionData = suggestionSnapshot.val();
+          setSuggestion(suggestionData);
+          
+          // Now fetch the original outfit
+          if (suggestionData.outfitId) {
+            const outfitRef = ref(db, `outfits/${suggestionData.outfitId}`);
+            const outfitSnapshot = await get(outfitRef);
+            
+            if (outfitSnapshot.exists()) {
+              setOriginalOutfit(outfitSnapshot.val());
+            } else {
+              setError("Original outfit not found");
+              console.warn("Original outfit not found");
+            }
+          }
+        } else {
+          setError("Suggestion not found");
+          console.warn("Suggestion not found");
+        }
+      } catch (err) {
+        setError("Error loading data: " + err.message);
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchSuggestion();
+    fetchData();
   }, [suggestionId, db]);
 
   const handleAccept = async () => {
@@ -147,31 +177,66 @@ const SuggestionModal = ({ show, onHide, suggestionId, outfitId, chatId, user })
     });
   };
 
-  if (!suggestion) return null;
+  if (!suggestion && !originalOutfit && !loading) return null;
 
   return (
-    <Modal show={show} onHide={onHide} centered size="sm">
+    <Modal 
+      show={show} 
+      onHide={onHide} 
+      centered 
+      size="sm" 
+      className="suggestion-modal"
+      backdropClassName="suggestion-modal-backdrop"
+    >
       <Modal.Header closeButton>
         <Modal.Title>Suggested Changes</Modal.Title>
       </Modal.Header>
       <Modal.Body className="text-center">
-        <ImageComponent 
-          src={suggestion.imageUrl} 
-          alt="Suggested Outfit" 
-          fluid 
-          className="mb-3"
-          style={{ maxHeight: '250px' }}
-        />
+        {loading ? (
+          <div className="loading-container">
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+            <p>Loading outfit comparison...</p>
+          </div>
+        ) : error ? (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        ) : (
+          <div className="outfit-comparison">
+            <div className="outfit-before">
+              <h4>Before</h4>
+              <ImageComponent 
+                src={originalOutfit.imageUrl} 
+                alt="Original Outfit" 
+                fluid 
+                className="mb-3 outfit-image"
+              />
+            </div>
+            <div className="outfit-after">
+              <h4>After</h4>
+              <ImageComponent 
+                src={suggestion.imageUrl} 
+                alt="Suggested Outfit" 
+                fluid 
+                className="mb-3 outfit-image"
+              />
+            </div>
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Close</Button>
-        <Button 
-          variant="dark" 
-          onClick={handleAccept}
-          style={{ background: '#000', borderColor: '#000' }}
-        >
-          Make This My Outfit
-        </Button>
+        {!loading && !error && (
+          <Button 
+            variant="dark" 
+            onClick={handleAccept}
+            style={{ background: '#000', borderColor: '#000' }}
+          >
+            Make This My Outfit
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

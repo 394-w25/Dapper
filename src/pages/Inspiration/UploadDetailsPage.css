@@ -5,6 +5,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-bottom: 30px;
 }
 
 .image-preview {
@@ -48,4 +49,10 @@
 
 .capture-button svg {
     margin-right: 5px;
+}
+
+.error-text {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
 }

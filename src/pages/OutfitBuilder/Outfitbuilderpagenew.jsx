@@ -49,6 +49,9 @@ const OutfitBuilderPageNew = () => {
   const [inspirations, setInspirations] = useState([]);
   const [savedOutfitId, setSavedOutfitId] = useState(null); // ✅ Store saved outfitId
   const [showFeedbackModal, setShowFeedbackModal] = useState(false); // ✅ Control feedback modal
+  const [outfitName, setOutfitName] = useState(""); // Store outfit name
+  const [showInput, setShowInput] = useState(true); // Control visibility of input field
+
 
 
   // Fetch user’s clothing
@@ -115,8 +118,12 @@ const OutfitBuilderPageNew = () => {
   };
 
   const handleReset = () => {
-    setOutfitItems({});
-  };
+    setOutfitItems({}); // Clear selected items
+    setShowInput(true); // Show input field again for a new outfit
+    setOutfitName(""); // Reset outfit name field
+    setSavedOutfitId(null); // Reset saved outfit ID to allow new saves
+};
+
 
   // Handle selecting an inspiration
   const handleSelectInspiration = (imageUrl) => {
@@ -137,6 +144,11 @@ const OutfitBuilderPageNew = () => {
             console.warn("⚠️ No clothing items selected!");
             return;
         }
+
+        if (!outfitName.trim()) {
+          setOutfitName(`My Outfit #${Date.now().toString().slice(-4)}`); // Generates a default name
+      }
+
 
         // **Step 1: Exclude "Inspiration" and fetch clothing images**
         const filteredOutfitItems = Object.entries(outfitItems)
@@ -200,8 +212,11 @@ const OutfitBuilderPageNew = () => {
             createdAt: Date.now(),
             clothingIDs, // Only valid clothing items, no inspiration
             imageUrl,
-            name: "My Outfit"
+            name: outfitName
         });
+
+        // ✅ Hide the input field after saving
+        setShowInput(false);
 
         // ✅ **Show success message**
         setSuccessMessage("🎉 Outfit saved successfully!");
@@ -325,6 +340,21 @@ const loadImage = (src) => {
 
         {/* ---- Footer Buttons ---- */}
         <div className="footer-buttons">
+
+          {/* Outfit Naming Input */}
+            {/* ✅ Show input field only if `showInput` is true */}
+        {showInput && (
+            <input
+            type="text"
+            className="outfit-name-input small-input"
+            placeholder="Enter outfit name..."
+            value={outfitName}
+            onChange={(e) => setOutfitName(e.target.value)}
+            autoFocus
+        />
+        
+        )}
+
         <Button variant="primary" className="save-button" onClick={handleSaveOutfit}>
             <FiSave /> Save
           </Button>

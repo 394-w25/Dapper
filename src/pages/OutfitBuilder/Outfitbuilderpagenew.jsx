@@ -8,7 +8,8 @@ import { database } from "../../utilities/firebase";
 import { getDatabase, ref, get, set, push } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import FeedbackRequestModal from "../Feedback/FeedbackRequestModal";
-import { useLocation, useNavigate } from 'react-router-dom';
+import CustomModal from '../../components/modal/CustomModal';
+
 
 // React icons
 import { FaTshirt } from 'react-icons/fa';
@@ -39,8 +40,6 @@ const OutfitBuilderPageNew = () => {
   const db = getDatabase();
   const storage = getStorage();
   const outfitRef = useRef(null);
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [outfitItems, setOutfitItems] = useState({});
   const [clothingItems, setClothingItems] = useState([]);
@@ -50,84 +49,12 @@ const OutfitBuilderPageNew = () => {
   const [inspirations, setInspirations] = useState([]);
   const [savedOutfitId, setSavedOutfitId] = useState(null); // ✅ Store saved outfitId
   const [showFeedbackModal, setShowFeedbackModal] = useState(false); // ✅ Control feedback modal
-  const [isEditing, setIsEditing] = useState(false);
-  const [outfitName, setOutfitName] = useState("My Outfit");
+  const [outfitName, setOutfitName] = useState(""); // Store outfit name
+  const [showInput, setShowInput] = useState(true); // Control visibility of input field
 
-  // Add loadOutfit function to load existing outfit data
-  const loadOutfit = async (outfitId) => {
-    try {
-      console.log("Loading outfit with ID:", outfitId);
-      const outfitRef = ref(database, `outfits/${outfitId}`);
-      const snapshot = await get(outfitRef);
 
-      if (snapshot.exists()) {
-        const outfitData = snapshot.val();
-        console.log("Outfit data loaded:", outfitData);
-        
-        // Set the outfit name
-        if (outfitData.name) {
-          setOutfitName(outfitData.name);
-        }
 
-        // If there are clothing IDs in the outfit, load them
-        if (outfitData.clothingIDs && outfitData.clothingIDs.length > 0) {
-          const newOutfitItems = {};
-          
-          // Load each clothing item
-          for (const clothingId of outfitData.clothingIDs) {
-            const clothingRef = ref(database, `clothing/${clothingId}`);
-            const clothingSnapshot = await get(clothingRef);
-            
-            if (clothingSnapshot.exists()) {
-              const clothingData = { id: clothingId, ...clothingSnapshot.val() };
-              
-              // Determine the category and add to outfitItems
-              if (clothingData.category === "Tops") {
-                newOutfitItems.Tops = clothingData;
-              } else if (clothingData.category === "Bottoms") {
-                newOutfitItems.Bottoms = clothingData;
-              } else if (clothingData.category === "Shoes") {
-                newOutfitItems.Shoes = clothingData;
-              } else if (clothingData.category === "Accessory") {
-                newOutfitItems.Accessory = clothingData;
-              } else if (clothingData.category === "Outerwear") {
-                newOutfitItems.Outerwear = clothingData;
-              }
-            }
-          }
-          
-          // Set the outfit items
-          setOutfitItems(newOutfitItems);
-          console.log("Outfit items loaded:", newOutfitItems);
-        }
-        
-        // Success message
-        setSuccessMessage("Outfit loaded for editing");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      } else {
-        console.error("Outfit not found");
-        setSuccessMessage("Error: Outfit not found");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      }
-    } catch (error) {
-      console.error("Error loading outfit:", error);
-      setSuccessMessage("Error loading outfit");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    }
-  };
-
-  // Check for editing mode on mount
-  useEffect(() => {
-    if (location.state && location.state.editOutfitId) {
-      const outfitId = location.state.editOutfitId;
-      console.log("Edit mode detected, outfit ID:", outfitId);
-      setSavedOutfitId(outfitId);
-      setIsEditing(true);
-      loadOutfit(outfitId);
-    }
-  }, [location]);
-
-  // Fetch user's clothing
+  // Fetch user’s clothing
   useEffect(() => {
     if (!user) return;
     const fetchUserClothing = async () => {
@@ -191,14 +118,20 @@ const OutfitBuilderPageNew = () => {
   };
 
   const handleReset = () => {
-    setOutfitItems({});
-  };
+    setOutfitItems({}); // Clear selected items
+    setShowInput(true); // Show input field again for a new outfit
+    setOutfitName(""); // Reset outfit name field
+    setSavedOutfitId(null); // Reset saved outfit ID to allow new saves
+};
+
 
   // Handle selecting an inspiration
   const handleSelectInspiration = (imageUrl) => {
     setOutfitItems(prev => ({ ...prev, Inspiration: { imageUrl } }));
     setShowModal(false);
   };
+
+
 
   // **SAVE OUTFIT FUNCTION**
   const handleSaveOutfit = async () => {
@@ -211,6 +144,11 @@ const OutfitBuilderPageNew = () => {
             console.warn("⚠️ No clothing items selected!");
             return;
         }
+
+        if (!outfitName.trim()) {
+          setOutfitName(`My Outfit #${Date.now().toString().slice(-4)}`); // Generates a default name
+      }
+
 
         // **Step 1: Exclude "Inspiration" and fetch clothing images**
         const filteredOutfitItems = Object.entries(outfitItems)
@@ -257,8 +195,7 @@ const OutfitBuilderPageNew = () => {
         const blob = await response.blob();
 
         // **Step 4: Upload new outfit image to Firebase Storage**
-        // If editing, use existing outfit ID, otherwise create a new one
-        const outfitId = isEditing ? savedOutfitId : push(ref(database, 'outfits')).key;
+        const outfitId = push(ref(database, 'outfits')).key; // Ensure 'database' is correctly referenced
         const imageRef = storageRef(storage, `outfits/${outfitId}.png`);
         await uploadBytes(imageRef, blob);
         const imageUrl = await getDownloadURL(imageRef);
@@ -267,48 +204,22 @@ const OutfitBuilderPageNew = () => {
 
         setSavedOutfitId(outfitId); // ✅ Store outfitId immediately
 
-        // **Step 5: Save outfit metadata in Firebase Database**
-        let outfitData = {};
-        
-        // If editing, fetch original data first to preserve fields
-        if (isEditing) {
-            const outfitRef = ref(database, `outfits/${outfitId}`);
-            const snapshot = await get(outfitRef);
-            
-            if (snapshot.exists()) {
-                // Start with all existing data
-                outfitData = snapshot.val();
-                
-                // Update the fields we want to change
-                outfitData.clothingIDs = clothingIDs;
-                outfitData.imageUrl = imageUrl;
-                outfitData.name = outfitName;
-                outfitData.updatedAt = Date.now();
-                
-                console.log("Updating existing outfit with ID:", outfitId);
-                console.log("Updated outfit data:", outfitData);
-            } else {
-                console.error("Cannot find outfit to update!");
-                setSuccessMessage("Error: Cannot find outfit to update");
-                return;
-            }
-        } else {
-            // For new outfits, create all fields
-            outfitData = {
-                outfitId,
-                clothingIDs,
-                imageUrl,
-                name: outfitName,
-                createdBy: user.uid,
-                createdAt: Date.now()
-            };
-        }
 
-        // Save to Firebase
-        await set(ref(database, `outfits/${outfitId}`), outfitData);
+        // **Step 5: Save outfit metadata in Firebase Database**
+        await set(ref(database, `outfits/${outfitId}`), {
+            outfitId,
+            createdBy: user.uid,
+            createdAt: Date.now(),
+            clothingIDs, // Only valid clothing items, no inspiration
+            imageUrl,
+            name: outfitName
+        });
+
+        // ✅ Hide the input field after saving
+        setShowInput(false);
 
         // ✅ **Show success message**
-        setSuccessMessage(isEditing ? "🎉 Outfit updated successfully!" : "🎉 Outfit created successfully!");
+        setSuccessMessage("🎉 Outfit saved successfully!");
         setTimeout(() => setSuccessMessage(""), 3000); // Clear message after 3s
     } catch (error) {
         console.error("❌ Error saving outfit:", error);
@@ -327,9 +238,12 @@ const loadImage = (src) => {
     });
 };
 
+  
+  
+
   return (
     <div className="outfit-builder">
-      <Header title={isEditing ? `Edit ${outfitName}` : "New Outfit"} />
+      <Header title="Outfit Builder" />
       <Container>
 
        {/* Success Message Alert with Floating Position */}
@@ -426,8 +340,23 @@ const loadImage = (src) => {
 
         {/* ---- Footer Buttons ---- */}
         <div className="footer-buttons">
+
+          {/* Outfit Naming Input */}
+            {/* ✅ Show input field only if `showInput` is true */}
+        {showInput && (
+            <input
+            type="text"
+            className="outfit-name-input small-input"
+            placeholder="Enter outfit name..."
+            value={outfitName}
+            onChange={(e) => setOutfitName(e.target.value)}
+            autoFocus
+        />
+        
+        )}
+
         <Button variant="primary" className="save-button" onClick={handleSaveOutfit}>
-            <FiSave /> {isEditing ? "Update" : "Save"}
+            <FiSave /> Save
           </Button>
                 {/* ✅ Show "Share" button only when outfit is saved */}
                 {savedOutfitId !== null && (
@@ -449,25 +378,21 @@ const loadImage = (src) => {
       </Container>
 
       {/* ---- Inspiration Selection Modal ---- */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} dialogClassName="mobile-modal">
-  <Modal.Header closeButton>
-    <Modal.Title>Select an Inspiration</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <div className="inspiration-grid">
-      {inspirations.map((inspo, index) => (
-        <div key={index} className="inspo-container">
-          <img
-            src={inspo.imageUrl}
-            alt="Inspiration"
-            className="inspo-thumbnail"
-            onClick={() => handleSelectInspiration(inspo.imageUrl)}
-          />
-        </div>
-      ))}
-    </div>
-  </Modal.Body>
-</Modal>
+      <CustomModal show={showModal} onClose={() => setShowModal(false)} title="Select an Inspiration">
+  <div className="inspiration-grid">
+    {inspirations.map((inspo, index) => (
+      <div key={index} className="inspo-container">
+        <img
+          src={inspo.imageUrl}
+          alt="Inspiration"
+          className="inspo-thumbnail"
+          onClick={() => handleSelectInspiration(inspo.imageUrl)}
+        />
+      </div>
+    ))}
+  </div>
+</CustomModal>
+
 
 {/* ✅ Feedback Request Modal with outfitId */}
 {showFeedbackModal && savedOutfitId && (

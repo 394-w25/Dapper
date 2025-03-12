@@ -124,7 +124,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 12px; /* Space between images */
   padding: 10px;
 }
 
@@ -181,3 +180,12 @@
   80% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-10px); }
 }
+
+.small-input {
+  width: 120px;  /* Adjust width */
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+

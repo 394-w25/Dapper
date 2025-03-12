@@ -63,6 +63,14 @@
     gap: 12px;
 }
 
+.friends-chat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto; /* Allow scrolling within the list if needed */
+    flex: 1; /* Take up remaining space */
+  }
+
 .friend-item, .chat-item {
     display: flex;
     align-items: center;

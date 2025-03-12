@@ -235,7 +235,7 @@ const FriendsPage = () => {
       {/* Chats Tab */}
       {activeTab === 'chats' && (
         <div className="chats-content">
-          <div className="chat-list">
+          <div className="friends-chat-list">
             {chats.length > 0 ? (
               chats.map((chat) => (
                 <div key={chat.id} className="chat-item" onClick={() => window.location.href = `/chat/${chat.id}`}>

@@ -5,6 +5,15 @@
   background-color: #fff;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  position: relative; /* so we can place the cart in top-right if desired */
+}
+
+/* Cart container in upper-right */
+.cart-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
 }
 
 /* Header section with search & concepts */
@@ -61,8 +70,7 @@
 }
 
 /* ---------------------------------
-   "My Concepts" - fully responsive
-   Monochrome palette
+  "My Concepts" 
 ---------------------------------- */
 .concepts-container {
   display: flex;
@@ -70,11 +78,11 @@
   align-items: center;
   width: 95%;
   max-width: 600px;
-  margin: 10px auto; /* Less vertical spacing */
-  padding: 10px;     /* Reduced padding */
-  background-color: #fff; /* Subtle background */
+  margin: 10px auto;
+  padding: 10px;
+  background-color: #fff;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .concepts-title {
@@ -95,7 +103,7 @@
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 20px;
-  padding: 6px 12px; /* Smaller “chip” size */
+  padding: 6px 12px;
   font-size: 7px;
   font-weight: 500;
   color: #333;
@@ -117,7 +125,7 @@
 }
 
 /* ---------------------------------
-   Main feed content
+  Main feed content
 ---------------------------------- */
 .discover-content {
   padding-top: 20px;
@@ -249,7 +257,7 @@
 }
 
 /* ---------------------------------
-   Media queries for small screens
+  Media queries for small screens
 ---------------------------------- */
 @media only screen and (max-width: 600px) {
   .discover {
